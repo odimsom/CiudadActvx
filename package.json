@@ -1,0 +1,27 @@
+{
+  "name": "ciudad-activa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma de reporte de incidencias urbanas",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tools/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "format": "prettier --write .",
+    "type-check": "turbo run type-check"
+  },
+  "devDependencies": {
+    "@turbo/gen": "^2.5.4",
+    "prettier": "^3.2.5",
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@8.15.1"
+}

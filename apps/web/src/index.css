@@ -1,0 +1,412 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset básico personalizado */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mapbox GL overrides */
+.mapboxgl-canvas {
+  outline: none;
+}
+
+.mapboxgl-ctrl-bottom-left,
+.mapboxgl-ctrl-bottom-right {
+  display: none;
+}
+
+/* Estilos para los marcadores de incidencias - FIJOS */
+.incident-marker-wrapper {
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+/* Popup limpio y sólido (sin transparencias) */
+.clean-incident-popup .mapboxgl-popup-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  background: white;
+  padding: 0;
+  max-width: 250px;
+}
+
+.clean-incident-popup .mapboxgl-popup-tip {
+  border-top-color: white;
+}
+
+/* Cursor personalizado */
+.cursor-crosshair {
+  cursor: crosshair;
+}
+
+.cursor-none {
+  cursor: none;
+}
+
+/* Animación para el spinner de carga */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Prevenir selección de texto durante gestos */
+.touch-none {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mejoras sutiles para los controles del mapa */
+.mapboxgl-ctrl-group {
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e5e7eb !important;
+}
+
+.mapboxgl-ctrl-group button {
+  border-radius: 4px !important;
+  background: white !important;
+}
+
+.mapboxgl-ctrl-group button:hover {
+  background: #f9fafb !important;
+}
+
+/* Efecto sonar wave - estilos adicionales si es necesario */
+.sonar-wave {
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Estilos limpios para formularios */
+.form-clean {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones limpios */
+.btn-clean {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.btn-clean:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-clean.primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.btn-clean.primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Remover cualquier glassmorphism anterior */
+.glass-effect {
+  display: none;
+}
+
+/* Estilos más sutiles para la interacción */
+.map-interaction-area {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+/* Indicador de pulsación larga */
+.press-indicator {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+}
+
+/* Estilos mejorados para el modal de reporte */
+.incident-form-modal {
+  --modal-bg: rgba(0, 0, 0, 0.8);
+  --modal-content-bg: #ffffff;
+  --modal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --modal-border-radius: 16px;
+}
+
+/* Overlay del modal más sólido */
+[data-radix-dialog-overlay] {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Contenido del modal completamente sólido */
+[data-radix-dialog-content] {
+  background-color: white !important;
+  border-radius: 24px !important;
+  border: none !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Animaciones de entrada más suaves para elementos del modal */
+.modal-enter {
+  animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Animación de entrada más suave para el modal */
+@keyframes modalEnterSmooth {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Efectos de hover mejorados para botones */
+.incident-type-button {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+}
+
+.incident-type-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.incident-type-button:active {
+  transform: translateY(0);
+  transition: all 0.1s ease;
+}
+
+/* Gradientes personalizados para el header */
+.header-gradient {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Efectos de glow para elementos importantes */
+.priority-button-selected {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Animación de carga suave */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Mejoras en la accesibilidad y focus */
+.focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6, 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Transiciones más suaves para todos los elementos interactivos */
+.smooth-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos para el efecto de shine en los botones */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.btn-shine:hover::before {
+  left: 100%;
+}
+
+/* Mejoras adicionales para el modal más amigable */
+[data-radix-dialog-content] {
+  border-radius: 24px !important;
+  border: none !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+  background: white !important;
+}
+
+/* Estilos mejorados para los marcadores de incidencias */
+.incident-marker-container {
+  position: relative;
+  z-index: 10;
+}
+
+.incident-marker-container:hover {
+  z-index: 20;
+}
+
+/* Mejoras en las animaciones del sonar */
+@keyframes sonarPulse {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.sonar-pulse {
+  animation: sonarPulse 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+/* Estilos para los tooltips mejorados */
+.tooltip-enter {
+  animation: tooltipEnter 0.2s ease-out;
+}
+
+@keyframes tooltipEnter {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mejoras en la accesibilidad */
+.focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Efectos de hover más suaves */
+.smooth-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para el panel de detalles */
+.details-panel-enter {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mejoras en los scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Estilos para la leyenda */
+.legend-panel {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Animaciones más fluidas para los elementos de la UI */
+.ui-element {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ui-element:hover {
+  transform: scale(1.02);
+}
+
+.ui-element:active {
+  transform: scale(0.98);
+  transition: all 0.1s ease;
+}

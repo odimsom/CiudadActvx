@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ciudad-activa/ui": ["./packages/ui/src"],
+      "@ciudad-activa/maps": ["./packages/maps/src"],
+      "@ciudad-activa/incidents": ["./packages/incidents/src"],
+      "@ciudad-activa/storage": ["./packages/storage/src"],
+      "@ciudad-activa/types": ["./packages/types/src"],
+      "@ciudad-activa/utils": ["./packages/utils/src"]
+    }
+  },
+  "include": [],
+  "references": [
+    { "path": "./apps/web" },
+    { "path": "./apps/mobile" },
+    { "path": "./apps/landing" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/maps" },
+    { "path": "./packages/incidents" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/types" },
+    { "path": "./packages/utils" }
+  ]
+}
