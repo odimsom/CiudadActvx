@@ -1,309 +1,219 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { motion } from 'framer-motion';
+import type { FeatureCollection } from 'geojson';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMapbox } from '@ciudad-activa/maps/hooks/useMapbox';
 import { Coordinates, IncidentReport, CreateIncidentData } from '@ciudad-activa/types';
 import { IncidentFormModal } from './IncidentFormModal';
 import { MapLegend } from './MapLegend';
 import { IncidentDetailsPanel } from './IncidentDetailsPanel';
-import { IncidentMarker } from './IncidentMarker';
 import { useIncidents } from '../hooks/useIncidents';
-import { SonarWave } from './SonarWave';
+import { AppHeader } from './AppHeader';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface CityMapProps {
   className?: string;
 }
 
-const LONG_PRESS_DURATION = 350; // 350ms para activar el sonar
-const MOVEMENT_THRESHOLD = 12; // 12 píxeles de tolerancia
-const VELOCITY_THRESHOLD = 0.5; // píxeles por ms - si se mueve muy rápido, es drag
-const AUTO_COMPLETE_DELAY = 150; // 150ms después del sonar para apertura MÁS RÁPIDA
-
 export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  
-  // Control de gestos mejorado
-  const pressTimer = useRef<number | null>(null);
-  const autoCompleteTimer = useRef<number | null>(null);
-  const initialPosition = useRef<{ x: number; y: number; time: number } | null>(null);
-  const lastPosition = useRef<{ x: number; y: number; time: number } | null>(null);
-  const isPressed = useRef(false);
-  const isDragging = useRef(false);
+  const markersRef = useRef<{ id: string; marker: mapboxgl.Marker }[]>([]);
 
   const { viewport, isLoaded, mapboxToken } = useMapbox();
   const { incidents, createIncident } = useIncidents();
 
-  // Estados
-  const [sonarState, setSonarState] = useState<{
-    isActive: boolean;
-    coordinates: { x: number; y: number } | null;
-  }>({
-    isActive: false,
-    coordinates: null,
-  });
-  
+  const [mostrarHeatmap, setMostrarHeatmap] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState<Coordinates | null>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [showCrosshair, setShowCrosshair] = useState(false);
-  
-  // Nuevos estados para los componentes
   const [selectedIncident, setSelectedIncident] = useState<IncidentReport | null>(null);
   const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
-  // Configurar el mapa
+  const pressTimer = useRef<number | null>(null);
+  const initialPosition = useRef<{ x: number; y: number } | null>(null);
+
+  const getMapStyle = () =>
+    mostrarHeatmap
+      ? 'mapbox://styles/mapbox/light-v11'
+      : 'mapbox://styles/mapbox/streets-v12';
+
   useEffect(() => {
     if (!isLoaded || !mapContainer.current || map.current) return;
 
     mapboxgl.accessToken = mapboxToken;
 
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [viewport.center.lng, viewport.center.lat],
-        zoom: viewport.zoom
-      });
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: getMapStyle(),
+      center: [viewport.center.lng, viewport.center.lat],
+      zoom: viewport.zoom
+    });
 
-      map.current.on('load', () => {
-        console.log('✅ Mapa cargado correctamente');
-        loadIncidentsOnMap();
-      });
+    map.current.on('load', () => {
+      loadIncidentsOnMap();
+      if (mostrarHeatmap) applyHeatmapLayer();
+    });
 
-    } catch (error) {
-      console.error('❌ Error al crear el mapa:', error);
-    }
+    map.current.on('styledata', () => {
+      loadIncidentsOnMap();
+      if (mostrarHeatmap) applyHeatmapLayer();
+    });
 
-    return () => {
-      map.current?.remove();
-    };
+    return () => map.current?.remove();
   }, [isLoaded, mapboxToken, viewport]);
 
-  // Cargar incidencias como marcadores FIJOS
   const loadIncidentsOnMap = useCallback(() => {
     if (!map.current) return;
+    const mapRef = map.current;
 
-    // Limpiar marcadores existentes
-    document.querySelectorAll('.incident-marker-wrapper').forEach(marker => marker.remove());
+    markersRef.current.forEach(({ marker }) => marker.remove());
+    markersRef.current = [];
 
-    incidents.forEach((incident: IncidentReport) => {
-      const markerWrapper = document.createElement('div');
-      markerWrapper.className = 'incident-marker-wrapper';
-
-      const markerElement = document.createElement('div');
-      markerElement.style.cssText = `
-        width: 26px;
-        height: 26px;
+    incidents.forEach((incident) => {
+      const el = document.createElement('div');
+      el.className = 'incident-marker';
+      el.style.cssText = `
+        width: 22px;
+        height: 22px;
         background: ${incident.type.color};
         border: 2px solid white;
         border-radius: 50%;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: bold;
-        color: white;
-        transition: all 0.2s ease;
-        position: relative;
-        z-index: 10;
       `;
-      
-      markerElement.innerHTML = '⚠';
-      
-      // Efecto hover
-      markerElement.addEventListener('mouseenter', () => {
-        markerElement.style.transform = 'scale(1.2)';
-        markerElement.style.zIndex = '20';
-      });
-      
-      markerElement.addEventListener('mouseleave', () => {
-        markerElement.style.transform = 'scale(1)';
-        markerElement.style.zIndex = '10';
-      });
 
-      markerWrapper.appendChild(markerElement);
-
-      // Popup limpio
-      const popup = new mapboxgl.Popup({ 
-        offset: 30,
-        closeButton: false,
-        className: 'clean-incident-popup'
-      }).setHTML(`
-        <div class="p-3 bg-white rounded-lg shadow-lg border max-w-xs">
-          <h3 class="font-semibold text-sm text-gray-800 mb-1">${incident.type.name}</h3>
-          <p class="text-xs text-gray-600 mb-2">${incident.description || 'Sin descripción'}</p>
-          <div class="text-xs text-gray-500">
-            ${new Date(incident.reportedAt).toLocaleDateString('es-ES')}
-          </div>
-        </div>
-      `);
-
-      // Crear marcador FIJO
-      new mapboxgl.Marker(markerWrapper)
+      const marker = new mapboxgl.Marker({ element: el })
         .setLngLat([incident.coordinates.lng, incident.coordinates.lat])
-        .setPopup(popup)
-        .addTo(map.current!);
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
+          <div class='text-sm'>
+            <strong>${incident.type.name}</strong>
+            <p>${incident.description || 'Sin descripción'}</p>
+            <small>${new Date(incident.reportedAt).toLocaleDateString('es-ES')}</small>
+          </div>
+        `))
+        .addTo(mapRef);
+
+      markersRef.current.push({ id: incident.id, marker });
     });
   }, [incidents]);
 
-  // Calcular velocidad de movimiento
-  const calculateVelocity = useCallback((currentPos: { x: number; y: number; time: number }) => {
-    if (!lastPosition.current) return 0;
-    
-    const deltaX = currentPos.x - lastPosition.current.x;
-    const deltaY = currentPos.y - lastPosition.current.y;
-    const deltaTime = currentPos.time - lastPosition.current.time;
-    
-    if (deltaTime === 0) return 0;
-    
-    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    return distance / deltaTime; // píxeles por milisegundo
-  }, []);
+  // BLOQUE HEATMAP MODIFICADO:
+  const applyHeatmapLayer = useCallback(() => {
+    if (!map.current) return;
 
-  // Iniciar pulsación
-  const startPress = useCallback((x: number, y: number) => {
-    const now = Date.now();
-    isPressed.current = true;
-    isDragging.current = false;
-    
-    initialPosition.current = { x, y, time: now };
-    lastPosition.current = { x, y, time: now };
-    
-    setShowCrosshair(true);
+    const mapRef = map.current;
+    const geojsonData: FeatureCollection = {
+      type: 'FeatureCollection',
+      features: incidents.map((i) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [i.coordinates.lng, i.coordinates.lat],
+        },
+        properties: {},
+      })),
+    };
 
-    // Timer para activar sonar
-    pressTimer.current = window.setTimeout(() => {
-      if (isPressed.current && !isDragging.current) {
-        // Usar la posición INICIAL del clic para centrar el sonar
-        setSonarState({
-          isActive: true,
-          coordinates: { x: initialPosition.current!.x, y: initialPosition.current!.y }
-        });
+    // Eliminar capas/sources previos
+    if (mapRef.getLayer('heatmap-incidencias')) mapRef.removeLayer('heatmap-incidencias');
+    if (mapRef.getSource('incidencias-heatmap')) mapRef.removeSource('incidencias-heatmap');
 
-        // Auto-completar después del sonar
-        autoCompleteTimer.current = window.setTimeout(() => {
-          if (isPressed.current && !isDragging.current) {
-            completePress();
-          }
-        }, AUTO_COMPLETE_DELAY);
-      }
-    }, LONG_PRESS_DURATION);
-  }, []);
+    mapRef.addSource('incidencias-heatmap', {
+      type: 'geojson',
+      data: geojsonData,
+    });
 
-  // Detectar movimiento inteligentemente
-  const handleMovement = useCallback((x: number, y: number) => {
-    if (!isPressed.current || !initialPosition.current) return;
+    mapRef.addLayer({
+      id: 'heatmap-incidencias',
+      type: 'heatmap',
+      source: 'incidencias-heatmap',
+      maxzoom: 17,
+      paint: {
+        // Radio escala con el zoom, para mantener densidad visual
+        'heatmap-radius': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 18,
+          10, 34,
+          15, 64,
+        ],
+        // Intensidad crece con zoom
+        'heatmap-intensity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          0, 0.8,
+          10, 2,
+          15, 6
+        ],
+        // Opacidad alta
+        'heatmap-opacity': 0.85,
+        // Peso fijo
+        'heatmap-weight': 1,
+        // Gradiente: azul-verde-amarillo-rojo clásico
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, 'rgba(0,0,255,0)',         // azul transparente
+          0.1, 'rgba(0,0,255,0.8)',     // azul
+          0.3, 'rgba(0,255,255,0.8)',   // cian
+          0.5, 'rgba(0,255,0,0.8)',     // verde
+          0.7, 'rgba(255,255,0,0.8)',   // amarillo
+          0.9, 'rgba(255,140,0,0.9)',   // naranja
+          1, 'rgba(255,0,0,1)'          // rojo fuerte
+        ]
+      },
+    });
+  }, [incidents]);
+  // -----
 
-    const now = Date.now();
-    const currentPos = { x, y, time: now };
-    
-    // Calcular distancia desde el punto inicial
-    const deltaX = x - initialPosition.current.x;
-    const deltaY = y - initialPosition.current.y;
-    const totalDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    
-    // Calcular velocidad de movimiento
-    const velocity = calculateVelocity(currentPos);
-    
-    // Actualizar última posición
-    lastPosition.current = currentPos;
-    
-    // Determinar si es un arrastre basado en distancia Y velocidad
-    if (totalDistance > MOVEMENT_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-      isDragging.current = true;
-      cancelPress();
-      return;
-    }
-  }, [calculateVelocity]);
-
-  const cancelPress = useCallback(() => {
-    if (pressTimer.current) {
-      clearTimeout(pressTimer.current);
-      pressTimer.current = null;
-    }
-    
-    if (autoCompleteTimer.current) {
-      clearTimeout(autoCompleteTimer.current);
-      autoCompleteTimer.current = null;
-    }
-    
-    isPressed.current = false;
-    isDragging.current = false;
-    initialPosition.current = null;
-    lastPosition.current = null;
-    
-    setShowCrosshair(false);
-    setSonarState({ isActive: false, coordinates: null });
-  }, []);
-
-  const completePress = useCallback(() => {
-    if (!initialPosition.current || !map.current) return;
-
-    // Usar la posición INICIAL para crear la incidencia
-    const lngLat = map.current.unproject([
-      initialPosition.current.x,
-      initialPosition.current.y
-    ]);
-
-    setSelectedCoordinates({ lat: lngLat.lat, lng: lngLat.lng });
-    setIsFormModalOpen(true);
-    
-    cancelPress();
-  }, [cancelPress]);
-
-  // Event handlers optimizados
-  const handlePointerDown = useCallback((event: React.PointerEvent) => {
-    if (event.button !== 0) return;
-    
-    // Usar coordenadas globales para el sonar (se ve exactamente donde hiciste clic)
-    startPress(event.clientX, event.clientY);
-  }, [startPress]);
-
-  const handlePointerMove = useCallback((event: React.PointerEvent) => {
-    if (isPressed.current) {
-      handleMovement(event.clientX, event.clientY);
-    }
-  }, [handleMovement]);
-
-  const handlePointerUp = useCallback(() => {
-    if (!sonarState.isActive) {
-      cancelPress();
-    }
-    // Si el sonar está activo, dejar que se complete automáticamente
-  }, [sonarState.isActive, cancelPress]);
-
-  // Cargar incidencias cuando cambien
   useEffect(() => {
-    loadIncidentsOnMap();
-  }, [loadIncidentsOnMap]);
+    if (mostrarHeatmap) {
+      applyHeatmapLayer();
+    } else if (map.current) {
+      if (map.current.getLayer('heatmap-incidencias')) map.current.removeLayer('heatmap-incidencias');
+      if (map.current.getSource('incidencias-heatmap')) map.current.removeSource('incidencias-heatmap');
+    }
+  }, [mostrarHeatmap, applyHeatmapLayer]);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    const timeout = window.setTimeout(() => {
+      if (!map.current) return;
+      const lngLat = map.current.unproject([e.clientX, e.clientY]);
+      setSelectedCoordinates({ lat: lngLat.lat, lng: lngLat.lng });
+      setIsFormModalOpen(true);
+    }, 500);
+    pressTimer.current = timeout;
+    initialPosition.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerUp = () => {
+    if (pressTimer.current) clearTimeout(pressTimer.current);
+    pressTimer.current = null;
+    initialPosition.current = null;
+  };
 
   return (
     <motion.div
-      className={`relative ${className} ${showCrosshair ? 'cursor-crosshair' : 'cursor-default'}`}
+      className={`relative ${className}`}
       onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerLeave={cancelPress}
-      style={{ touchAction: 'pan-x pan-y' }} // Permitir pan del mapa
+      onPointerLeave={handlePointerUp}
+      style={{ touchAction: 'pan-x pan-y' }}
     >
-      <div ref={mapContainer} className="h-full w-full" />
-
-      <SonarWave 
-        isActive={sonarState.isActive}
-        coordinates={sonarState.coordinates}
+      <AppHeader
+        incidentCount={incidents.length}
+        mostrarHeatmap={mostrarHeatmap}
+        onToggleHeatmap={() => setMostrarHeatmap(prev => !prev)}
       />
 
-      {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-sm font-medium text-gray-700">Cargando mapa...</p>
-          </div>
-        </div>
-      )}      {selectedCoordinates && (
+      <div ref={mapContainer} className="h-full w-full" />
+
+      {selectedCoordinates && (
         <IncidentFormModal
           isOpen={isFormModalOpen}
           onClose={() => {
@@ -314,15 +224,15 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
             await createIncident(data);
             setIsFormModalOpen(false);
             setSelectedCoordinates(null);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 4000);
           }}
           coordinates={selectedCoordinates}
         />
       )}
 
-      {/* Leyenda del mapa */}
       <MapLegend />
 
-      {/* Panel de detalles de incidencia */}
       <IncidentDetailsPanel
         incident={selectedIncident}
         isOpen={isDetailsPanelOpen}
@@ -332,49 +242,18 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
         }}
       />
 
-      {/* Marcadores de incidencias mejorados */}
-      {incidents.map((incident) => {
-        const markerElement = document.createElement('div');
-        markerElement.className = 'incident-marker-container';
-        
-        // Crear marcador personalizado si no existe
-        const existingMarker = map.current?.getSource(`incident-${incident.id}`);
-        if (!existingMarker && map.current) {
-          // Renderizar el componente IncidentMarker
-          import('react-dom/client').then(({ createRoot }) => {
-            const root = createRoot(markerElement);
-            root.render(
-              <IncidentMarker
-                incident={incident}
-                isSelected={selectedIncident?.id === incident.id}
-                onClick={() => {
-                  setSelectedIncident(incident);
-                  setIsDetailsPanelOpen(true);
-                }}
-                size="medium"
-              />
-            );
-          });
-
-          // Crear el marcador de Mapbox
-          new mapboxgl.Marker(markerElement)
-            .setLngLat([incident.coordinates.lng, incident.coordinates.lat])
-            .addTo(map.current);
-        }
-        
-        return null;
-      })}      {/* Leyenda del mapa */}
-      <MapLegend />
-
-      {/* Panel de detalles de incidencia */}
-      <IncidentDetailsPanel
-        incident={selectedIncident}
-        isOpen={isDetailsPanelOpen}
-        onClose={() => {
-          setIsDetailsPanelOpen(false);
-          setSelectedIncident(null);
-        }}
-      />
+      <AnimatePresence>
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50"
+          >
+            ¡Gracias por ayudar a mejorar tu comunidad! 💙
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
