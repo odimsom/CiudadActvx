@@ -1,7 +1,6 @@
 {
-  "buildCommand": "pnpm run build",
+  "buildCommand": "pnpm run build --filter=@ciudad-activa/landing",
   "outputDirectory": "apps/landing/dist",
-  "framework": "astro",
   "installCommand": "pnpm install",
   "env": {
     "PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoib2RpbXNvbSIsImEiOiJjbWRoOXcwa3cwMTg4MmtuOWdnaTVyamc0In0.5geWHeQ9BZQLSOSxW6OJ1A"
