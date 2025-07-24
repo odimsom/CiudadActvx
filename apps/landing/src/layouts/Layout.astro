@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css';
+
 export interface Props {
   title: string;
   description?: string;
@@ -17,95 +19,6 @@ const { title, description = "Ciudad Activa - Reporta y mejora tu ciudad" } = As
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#3B82F6" />
     <title>{title}</title>
-    
-    <!-- Tailwind CSS CDN para garantizar que se cargue -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Configuración de Tailwind */
-      tailwind.config = {
-        theme: {
-          extend: {
-            animation: {
-              'float': 'float 6s ease-in-out infinite',
-              'pulse-slow': 'pulse 4s ease-in-out infinite',
-              'bounce-slow': 'bounce 3s ease-in-out infinite',
-            },
-            keyframes: {
-              float: {
-                '0%, 100%': { transform: 'translateY(0px)' },
-                '50%': { transform: 'translateY(-20px)' }
-              }
-            }
-          }
-        }
-      }
-      
-      /* Estilos adicionales */
-      .loader {
-        border: 4px solid #f3f4f6;
-        border-top: 4px solid #3B82F6;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-      }
-      
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      
-      @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-      }
-      
-      .animate-float {
-        animation: float 6s ease-in-out infinite;
-      }
-      
-      .animate-pulse-slow {
-        animation: pulse 4s ease-in-out infinite;
-      }
-      
-      .animate-sonar {
-        animation: sonar 2s ease-out infinite;
-      }
-      
-      @keyframes sonar {
-        0% {
-          transform: scale(1);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(2);
-          opacity: 0;
-        }
-      }
-      
-      /* Estilos para el mapa */
-      .mapboxgl-popup-content {
-        padding: 0;
-        border-radius: 8px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      }
-      
-      .mapboxgl-popup-close-button {
-        display: none;
-      }
-      
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .hero-title {
-          font-size: 2.5rem;
-          line-height: 1.2;
-        }
-        
-        .hero-subtitle {
-          font-size: 1.1rem;
-        }
-      }
-    </style>
     
     <!-- Preload critical resources -->
     <link rel="preload" href="https://unpkg.com/lucide@latest/dist/umd/lucide.js" as="script" />

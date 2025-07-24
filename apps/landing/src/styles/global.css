@@ -38,3 +38,41 @@ html {
 .animate-bounce-slow {
   animation: bounce 3s ease-in-out infinite;
 }
+
+@keyframes sonar {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-sonar {
+  animation: sonar 2s ease-out infinite;
+}
+
+/* Estilos para el mapa */
+.mapboxgl-popup-content {
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+}
