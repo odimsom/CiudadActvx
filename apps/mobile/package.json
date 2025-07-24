@@ -9,10 +9,16 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build": "expo export",
+    "build:android": "expo build:android",
+    "build:ios": "expo build:ios",
+    "eject": "expo eject",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "dev": "expo start --dev-client",
+    "tunnel": "expo start --tunnel"
   },
   "dependencies": {
+    "@ciudad-activa/incidents": "workspace:*",
     "@ciudad-activa/maps": "workspace:*",
     "@ciudad-activa/types": "workspace:*",
     "@ciudad-activa/utils": "workspace:*",
