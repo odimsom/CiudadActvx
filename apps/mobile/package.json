@@ -18,7 +18,6 @@
     "tunnel": "expo start --tunnel"
   },
   "dependencies": {
-    "@ciudad-activa/incidents": "workspace:*",
     "@ciudad-activa/maps": "workspace:*",
     "@ciudad-activa/types": "workspace:*",
     "@ciudad-activa/utils": "workspace:*",

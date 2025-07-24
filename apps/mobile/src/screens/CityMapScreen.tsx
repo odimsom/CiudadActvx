@@ -10,7 +10,7 @@ import {
   PanResponder,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { useIncidents } from '@ciudad-activa/incidents/hooks';
+import { useIncidents } from '../hooks/useIncidents';
 import { Coordinates, IncidentReport, CreateIncidentData } from '@ciudad-activa/types';
 import { IncidentFormModal } from '../components/IncidentFormModal';
 import { IncidentDetailsPanel } from '../components/IncidentDetailsPanel';
