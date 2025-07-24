@@ -1,14 +1,9 @@
 {
-  "buildCommand": "cd apps/landing && npm run build",
+  "buildCommand": "cd apps/landing && pnpm install && pnpm run build -- --config astro.config.vercel.mjs",
   "outputDirectory": "apps/landing/dist",
   "framework": "astro",
-  "installCommand": "npm install && cd apps/landing && npm install",
-  "devCommand": "cd apps/landing && npm run dev",
-  "functions": {
-    "apps/landing/src/pages/api/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
+  "installCommand": "pnpm install",
+  "devCommand": "cd apps/landing && pnpm run dev",
   "env": {
     "PUBLIC_MAPBOX_TOKEN": "@mapbox_token"
   }
