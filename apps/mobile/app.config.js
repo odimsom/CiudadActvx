@@ -18,9 +18,7 @@ export default {
       bundler: "metro",
       output: "static",
     },
-    plugins: [
-      "expo-router"
-    ],
+    plugins: ["expo-router"],
     extra: {
       mapboxToken: process.env.EXPO_PUBLIC_MAPBOX_TOKEN,
     },
