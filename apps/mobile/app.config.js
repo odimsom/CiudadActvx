@@ -17,6 +17,8 @@ export default {
     web: {
       bundler: "metro",
       output: "static",
+      favicon:
+        "https://cdn.jsdelivr.net/npm/emoji-datasource-apple@15.0.1/img/apple/64/1f3db-fe0f.png",
     },
     plugins: ["expo-router"],
     extra: {
