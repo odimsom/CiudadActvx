@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd apps/mobile && pnpm run build",
+  "outputDirectory": "apps/mobile/dist",
+  "installCommand": "pnpm install",
+  "env": {
+    "EXPO_PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoib2RpbXNvbSIsImEiOiJjbWRoOXcwa3cwMTg4MmtuOWdnaTVyamc0In0.5geWHeQ9BZQLSOSxW6OJ1A"
+  }
+}
