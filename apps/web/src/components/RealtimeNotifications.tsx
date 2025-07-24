@@ -15,7 +15,7 @@ interface RealtimeNotification {
 
 export const RealtimeNotifications: React.FC = () => {
   const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
-  const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [lastUpdate, setLastUpdate] = useState(Date.now() - 30000); // Permitir notificaciones de los últimos 30 segundos
 
   useEffect(() => {
     const server = SimpleServer.getInstance();
@@ -24,33 +24,56 @@ export const RealtimeNotifications: React.FC = () => {
     const unsubscribe = server.subscribe((incidents) => {
       const now = Date.now();
       
-      // Solo mostrar notificaciones de cambios muy recientes (últimos 10 segundos)
+      // Buscar incidentes nuevos o actualizados desde la última verificación
       const recentIncidents = incidents.filter((incident: any) => {
         const updatedAt = new Date(incident.updatedAt).getTime();
-        return updatedAt > lastUpdate;
+        const reportedAt = new Date(incident.reportedAt).getTime();
+        
+        // Incluir si es nuevo o fue actualizado recientemente
+        return updatedAt > lastUpdate || reportedAt > lastUpdate;
       });
 
       if (recentIncidents.length > 0) {
         const newNotifications = recentIncidents.map((incident: any) => {
-          const isNewReport = new Date(incident.reportedAt).getTime() > lastUpdate;
+          const isNewReport = new Date(incident.reportedAt).getTime() > (now - 15000); // Nuevo en los últimos 15 segundos
           const isResolved = incident.status === 'resolved';
+          const isInProgress = incident.status === 'in_progress';
+          
+          let type: RealtimeNotification['type'] = 'update';
+          let title = '🔄 Actualización';
+          let message = `${incident.title} actualizado`;
+          
+          if (isNewReport) {
+            type = 'new_report';
+            title = '🆕 Nuevo reporte';
+            message = `${incident.title} reportado en ${incident.address || 'ubicación desconocida'}`;
+          } else if (isResolved) {
+            type = 'resolved';
+            title = '✅ Problema resuelto';
+            message = `${incident.title} ha sido marcado como resuelto`;
+          } else if (isInProgress) {
+            title = '🔧 En progreso';
+            message = `${incident.title} está siendo atendido`;
+          }
           
           return {
-            id: `${incident.id}-${now}`,
-            type: isNewReport ? 'new_report' as const : isResolved ? 'resolved' as const : 'update' as const,
-            title: isNewReport ? '🆕 Nuevo reporte' : isResolved ? '✅ Problema resuelto' : '🔄 Actualización',
-            message: isNewReport 
-              ? `${incident.title} reportado en ${incident.address || 'ubicación'}`
-              : isResolved 
-              ? `${incident.title} ha sido resuelto`
-              : `${incident.title} actualizado`,
+            id: `${incident.id}-${now}-${Math.random()}`, // ID único para evitar duplicados
+            type,
+            title,
+            message,
             timestamp: new Date(),
             reportId: incident.id,
             location: incident.address
           };
         });
 
-        setNotifications(prev => [...newNotifications, ...prev].slice(0, 5));
+        // Evitar notificaciones duplicadas
+        setNotifications(prev => {
+          const existingIds = new Set(prev.map(n => n.reportId));
+          const filteredNew = newNotifications.filter(n => !existingIds.has(n.reportId));
+          return [...filteredNew, ...prev].slice(0, 5);
+        });
+        
         setLastUpdate(now);
       }
     });

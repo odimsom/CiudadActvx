@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css';
+
 export interface Props {
   title: string;
   description?: string;
@@ -8,7 +10,7 @@ const { title, description = "Ciudad Activa - Reporta y mejora tu ciudad" } = As
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
@@ -17,8 +19,22 @@ const { title, description = "Ciudad Activa - Reporta y mejora tu ciudad" } = As
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#3B82F6" />
     <title>{title}</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://unpkg.com/lucide@latest/dist/umd/lucide.js" as="script" />
   </head>
-  <body>
+  <body class="min-h-screen bg-gray-50 antialiased">
     <slot />
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+      // Initialize Lucide icons when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+      });
+    </script>
   </body>
 </html>

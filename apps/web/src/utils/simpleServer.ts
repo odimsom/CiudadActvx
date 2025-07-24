@@ -6,9 +6,12 @@ export class SimpleServer {
   private storageKey = 'ciudad-activa-server-simulation';
   private syncInterval: number | null = null;
   private subscribers: Array<(incidents: any[]) => void> = [];
+  private lastUserActivity: number = Date.now();
+  private isUserActive: boolean = false;
 
   private constructor() {
     this.startSyncSimulation();
+    this.trackUserActivity();
   }
 
   static getInstance(): SimpleServer {
@@ -18,19 +21,41 @@ export class SimpleServer {
     return SimpleServer.instance;
   }
 
+  // Rastrear actividad del usuario
+  private trackUserActivity() {
+    const updateActivity = () => {
+      this.lastUserActivity = Date.now();
+      this.isUserActive = true;
+    };
+
+    // Escuchar eventos de actividad
+    ['click', 'scroll', 'keypress', 'mousemove'].forEach(event => {
+      document.addEventListener(event, updateActivity, { passive: true });
+    });
+
+    // Verificar inactividad cada minuto
+    setInterval(() => {
+      const timeSinceLastActivity = Date.now() - this.lastUserActivity;
+      this.isUserActive = timeSinceLastActivity < 120000; // Activo si hubo actividad en los últimos 2 minutos
+    }, 60000);
+  }
+
   // Simular sincronización con "servidor"
   private startSyncSimulation() {
     this.syncInterval = window.setInterval(() => {
-      this.simulateServerUpdates();
-    }, 5000); // Sincronizar cada 5 segundos
+      // Solo simular actividad si el usuario está activo
+      if (this.isUserActive) {
+        this.simulateServerUpdates();
+      }
+    }, 8000); // Aumentar intervalo a 8 segundos
   }
 
   // Simular actualizaciones del servidor (otros usuarios reportando)
   private simulateServerUpdates() {
     const serverData = this.getServerData();
     
-    // 10% de probabilidad de que llegue un nuevo reporte "del servidor"
-    if (Math.random() < 0.1) {
+    // Reducir probabilidad: 5% solo si hay reportes existentes
+    if (Math.random() < 0.05 && serverData.length > 0) {
       const newReport = this.generateRandomReport();
       serverData.push(newReport);
       this.saveServerData(serverData);
@@ -40,8 +65,8 @@ export class SimpleServer {
       this.showNotification(newReport);
     }
 
-    // 15% de probabilidad de que un reporte cambie de estado
-    if (Math.random() < 0.15) {
+    // 10% de probabilidad de que un reporte cambie de estado (solo si hay reportes)
+    if (Math.random() < 0.1 && serverData.length > 0) {
       const pendingReports = serverData.filter((r: any) => r.status === 'pending');
       if (pendingReports.length > 0) {
         const reportToUpdate = pendingReports[Math.floor(Math.random() * pendingReports.length)];

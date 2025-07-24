@@ -1,31 +1,14 @@
 ---
 // Landing page para Ciudad Activa
 // Inspirada en el diseño y funcionalidad del módulo web
+import Layout from '../layouts/Layout.astro';
+
 const title = "Ciudad Activa - Reporta y Mejora Tu Ciudad";
 const description = "Únete a miles de ciudadanos que están transformando su comunidad. Reporta incidencias, ve el progreso en tiempo real y ayuda a construir una ciudad mejor.";
 ---
 
-<html lang="es" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{title}</title>
-  <meta name="description" content={description}>
-  
-  <!-- Favicon y PWA -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#3B82F6">
-  <link rel="apple-touch-icon" href="/icon-192x192.png">
-  
-  <!-- OpenGraph / Social Media -->
-  <meta property="og:title" content={title}>
-  <meta property="og:description" content={description}>
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="/og-image.jpg">
-  
-  <!-- Iconos de Lucide -->
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+<Layout title={title} description={description}>
+  <!-- Hero Section -->
   
   <style>
     .loader {
@@ -797,5 +780,4 @@ const description = "Únete a miles de ciudadanos que están transformando su co
       }, 10000);
     });
   </script>
-</body>
-</html>
+</Layout>
