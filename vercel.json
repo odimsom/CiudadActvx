@@ -3,8 +3,5 @@
   "outputDirectory": "apps/landing/dist",
   "framework": "astro",
   "installCommand": "pnpm install",
-  "devCommand": "cd apps/landing && pnpm run dev",
-  "env": {
-    "PUBLIC_MAPBOX_TOKEN": "@mapbox_token"
-  }
+  "devCommand": "cd apps/landing && pnpm run dev"
 }
