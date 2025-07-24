@@ -5,6 +5,7 @@ La aplicación móvil nativa de Ciudad Activa construida con React Native y Expo
 ## 🚀 Funcionalidades
 
 ### Core Features
+
 - **Mapa Interactivo**: Visualización de incidentes en tiempo real con Mapbox
 - **Reportar Incidentes**: Interfaz touch-friendly para reportar problemas urbanos
 - **Geolocalización**: Ubicación automática y navegación optimizada para móvil
@@ -12,6 +13,7 @@ La aplicación móvil nativa de Ciudad Activa construida con React Native y Expo
 - **Modo Offline**: Funcionalidad básica sin conexión a internet
 
 ### Características Móviles
+
 - **Long Press**: Mantén presionado el mapa para reportar un incidente
 - **Gestos Touch**: Navegación intuitiva con gestos nativos
 - **Panel Deslizante**: Detalles de incidentes en panel deslizable
@@ -19,6 +21,7 @@ La aplicación móvil nativa de Ciudad Activa construida con React Native y Expo
 - **Diseño Responsivo**: Optimizado para diferentes tamaños de pantalla
 
 ### Tipos de Incidentes
+
 - 🕳️ **Baches**: Problemas en pavimento
 - 💡 **Alumbrado**: Fallas en iluminación pública
 - 🗑️ **Basura**: Problemas de limpieza urbana
@@ -29,6 +32,7 @@ La aplicación móvil nativa de Ciudad Activa construida con React Native y Expo
 ## 📱 Instalación y Desarrollo
 
 ### Prerrequisitos
+
 ```bash
 # Instalar Expo CLI
 npm install -g expo-cli
@@ -38,6 +42,7 @@ npx expo-cli
 ```
 
 ### Desarrollo Local
+
 ```bash
 # Desde la raíz del proyecto
 cd apps/mobile
@@ -55,7 +60,9 @@ pnpm run web      # Web (para pruebas)
 ```
 
 ### Probar en Dispositivo
+
 1. **Instala Expo Go** en tu dispositivo móvil
+
    - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
    - [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
 
@@ -66,6 +73,7 @@ pnpm run web      # Web (para pruebas)
 ## 🏗️ Arquitectura
 
 ### Estructura de Archivos
+
 ```
 apps/mobile/
 ├── App.tsx                 # Punto de entrada principal
@@ -84,6 +92,7 @@ apps/mobile/
 ```
 
 ### Dependencias Principales
+
 - **React Native**: Framework base
 - **Expo**: Plataforma de desarrollo
 - **React Navigation**: Navegación entre pantallas
@@ -96,6 +105,7 @@ apps/mobile/
 ## 🎨 Diseño y UX
 
 ### Principios de Diseño
+
 - **Mobile First**: Diseñado específicamente para móviles
 - **Touch Friendly**: Botones y áreas touch optimizadas
 - **Gestos Intuitivos**: Long press, swipe, pinch-to-zoom
@@ -103,6 +113,7 @@ apps/mobile/
 - **Dark Mode Ready**: Soporte para modo oscuro
 
 ### Patrones de Interacción
+
 - **Long Press en Mapa**: Reportar incidente
 - **Tap en Marcador**: Ver detalles
 - **Swipe Up**: Panel de detalles
@@ -112,6 +123,7 @@ apps/mobile/
 ## 🚀 Despliegue
 
 ### Build para Producción
+
 ```bash
 # Build optimizado
 pnpm run build
@@ -124,6 +136,7 @@ expo build:ios
 ```
 
 ### Distribución
+
 - **Expo Go**: Para desarrollo y testing
 - **Standalone Apps**: APK/IPA para distribución
 - **App Stores**: Publicación en tiendas oficiales
@@ -132,6 +145,7 @@ expo build:ios
 ## 🔧 Configuración
 
 ### Variables de Entorno
+
 ```bash
 # En .env
 EXPO_PUBLIC_MAPBOX_TOKEN=your_mapbox_token
@@ -139,6 +153,7 @@ EXPO_PUBLIC_API_URL=https://api.ciudad-activa.com
 ```
 
 ### app.config.js
+
 ```javascript
 export default {
   expo: {
@@ -153,6 +168,7 @@ export default {
 ## 🧪 Testing
 
 ### Testing en Desarrollo
+
 ```bash
 # Lint del código
 pnpm run lint
@@ -165,6 +181,7 @@ pnpm test
 ```
 
 ### Testing en Dispositivos
+
 - **Expo Go**: Testing rápido en dispositivo real
 - **Simuladores**: iOS Simulator, Android Emulator
 - **Device Testing**: Testing en múltiples dispositivos
@@ -172,12 +189,14 @@ pnpm test
 ## 📊 Monitoreo y Analytics
 
 ### Métricas Importantes
+
 - **Crash Reports**: Errores de la aplicación
 - **Performance**: Tiempo de carga, FPS
 - **User Engagement**: Tiempo en app, acciones
 - **Feature Usage**: Funcionalidades más usadas
 
 ### Tools Integrados
+
 - **Expo Analytics**: Métricas básicas
 - **Crashlytics**: Reporte de errores
 - **Performance Monitoring**: Rendimiento
@@ -185,6 +204,7 @@ pnpm test
 ## 🤝 Contribución
 
 ### Desarrollo
+
 1. Fork el repositorio
 2. Crea una branch: `git checkout -b feature/nueva-funcionalidad`
 3. Desarrolla la funcionalidad
@@ -192,6 +212,7 @@ pnpm test
 5. Crea un Pull Request
 
 ### Guidelines
+
 - Seguir convenciones de React Native
 - Probar en iOS y Android
 - Documentar cambios importantes
@@ -200,12 +221,14 @@ pnpm test
 ## 📚 Recursos
 
 ### Documentación
+
 - [React Native](https://reactnative.dev/)
 - [Expo Documentation](https://docs.expo.dev/)
 - [React Navigation](https://reactnavigation.org/)
 - [React Native Maps](https://github.com/react-native-maps/react-native-maps)
 
 ### Comunidad
+
 - [React Native Community](https://github.com/react-native-community)
 - [Expo Forums](https://forums.expo.dev/)
 - [Stack Overflow](https://stackoverflow.com/questions/tagged/react-native)
