@@ -1,0 +1,13 @@
+{
+  "name": "ciudad-activa-web",
+  "buildCommand": "pnpm install && cd apps/web && pnpm run build",
+  "outputDirectory": "apps/web/dist",
+  "framework": "vite",
+  "installCommand": "pnpm install",
+  "devCommand": "cd apps/web && pnpm run dev",
+  "env": {
+    "VITE_MAPBOX_TOKEN": "pk.eyJ1Ijoib2RpbXNvbSIsImEiOiJjbWRoOXcwa3cwMTg4MmtuOWdnaTVyamc0In0.5geWHeQ9BZQLSOSxW6OJ1A",
+    "VITE_APP_NAME": "Ciudad Activa",
+    "VITE_APP_VERSION": "1.0.0"
+  }
+}
