@@ -135,7 +135,7 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ open, onClose 
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value">
-                  {priorityCounts.map((entry, i) => (
+                  {priorityCounts.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Bar>
@@ -164,14 +164,14 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ open, onClose 
                   labelFormatter={label => label}
                 />
                 <Bar dataKey="value">
-                  {categoryCounts.map((entry, i) => (
+                  {categoryCounts.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
             <div className="flex gap-2 flex-wrap justify-center text-xs mt-2">
-              {categoryCounts.map((cat, i) => (
+              {categoryCounts.map((cat) => (
                 <span key={cat.name} className="flex items-center gap-1">
                   <span className="inline-block w-3 h-3 rounded-full" style={{ background: cat.color }}></span>
                   {cat.name}

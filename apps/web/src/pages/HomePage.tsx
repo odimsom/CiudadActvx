@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100">
       {/* Header de la aplicación */}
-      <AppHeader incidentCount={pendingIncidents} />
+      <AppHeader incidentCount={pendingIncidents} mostrarHeatmap onToggleHeatmap={useIncidents} />
       
       {/* Contenedor del mapa que ocupa el espacio restante */}
       <main className="flex-1">

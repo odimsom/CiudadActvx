@@ -119,6 +119,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                 <button
                   onClick={onClose}
                   className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:rotate-90"
+                  aria-label="Cerrar panel de detalles"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -151,7 +152,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                   <div>
                     <p className="font-medium text-gray-800 mb-1">Ubicación</p>
                     <p className="text-sm text-gray-600">{incident.address || 'Dirección no disponible'}</p>
-                    <p className="text-xs bg-white px-2 py-1 rounded-full inline-block">
+                    <p className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full inline-block mt-1">
                       {incident.coordinates.lat.toFixed(6)}, {incident.coordinates.lng.toFixed(6)}
                     </p>
                   </div>
@@ -186,17 +187,17 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                 </div>
               </div>
 
-              {(incident.photos?.length || incident.images?.length) > 0 && (
+              {((incident.photos?.length ?? 0) > 0 || (incident.images?.length ?? 0) > 0) && (
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <Camera className="w-4 h-4" /> Fotografías
                   </h4>
                   <div className="grid grid-cols-2 gap-3">
-                    {(incident.photos || incident.images?.map(img => img.url)).map((photo, index) => (
+                    {(incident.photos || incident.images?.map(img => img.url) || []).map((photo, index) => (
                       <div key={index} className="relative group">
                         <img
                           src={photo}
-                          alt={`Foto ${index + 1}`}
+                          alt={`Fotografía ${index + 1} del incidente`}
                           className="w-full h-24 object-cover rounded-xl border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl flex items-center justify-center transition-colors">
@@ -215,13 +216,16 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                     <div className="flex items-center gap-1"><ThumbsUp className="w-4 h-4" /><span>{incident.votes || 0}</span></div>
                     <div className="flex items-center gap-1"><MessageCircle className="w-4 h-4" /><span>{incident.notes?.length || 0}</span></div>
                   </div>
-                  <button className="text-blue-500 hover:text-blue-600 transition-colors">
+                  <button 
+                    className="text-blue-500 hover:text-blue-600 transition-colors"
+                    aria-label="Compartir incidencia"
+                  >
                     <Share2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {incident.notes?.length > 0 && (
+              {incident.notes && incident.notes.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-3">Actualizaciones ({incident.notes.length})</h4>
                   <div className="space-y-3">
@@ -231,7 +235,10 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                       </div>
                     ))}
                     {incident.notes.length > 3 && (
-                      <button className="text-sm text-blue-500 hover:text-blue-600 font-medium">
+                      <button 
+                        className="text-sm text-blue-500 hover:text-blue-600 font-medium"
+                        aria-label="Ver todas las actualizaciones"
+                      >
                         Ver todas las actualizaciones
                       </button>
                     )}
