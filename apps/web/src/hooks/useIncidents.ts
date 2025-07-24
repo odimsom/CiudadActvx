@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { IncidentReport, CreateIncidentData, IncidentStatus, IncidentPriority, IncidentCategory } from '@ciudad-activa/types';
-
-const STORAGE_KEY = 'ciudad-activa-incidents';
+import { SimpleServer } from '../utils/simpleServer';
 
 // Datos de ejemplo
 const EXAMPLE_INCIDENTS: IncidentReport[] = [
@@ -69,40 +68,55 @@ const EXAMPLE_INCIDENTS: IncidentReport[] = [
 export const useIncidents = () => {
   const [incidents, setIncidents] = useState<IncidentReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const serverRef = useRef<SimpleServer | null>(null);
 
-  // Cargar incidencias del localStorage
+  // Inicializar servidor y suscribirse a cambios
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Convertir strings de fecha a objetos Date
-        const processedIncidents = parsed.map((incident: any) => ({
+    serverRef.current = SimpleServer.getInstance();
+    
+    // Solicitar permisos de notificación
+    serverRef.current.requestNotificationPermission();
+    
+    // Suscribirse a actualizaciones del servidor
+    const unsubscribe = serverRef.current.subscribe((serverIncidents) => {
+      // Convertir datos del servidor a formato local
+      const processedIncidents = serverIncidents.map((incident: any) => ({
+        ...incident,
+        reportedAt: new Date(incident.reportedAt),
+        updatedAt: new Date(incident.updatedAt),
+        estimatedResolution: incident.estimatedResolution 
+          ? new Date(incident.estimatedResolution) 
+          : undefined
+      }));
+      
+      setIncidents(processedIncidents);
+      setLoading(false);
+    });
+
+    // Inicializar con datos de ejemplo si no hay datos
+    const serverData = serverRef.current.getServerData();
+    if (serverData.length === 0) {
+      EXAMPLE_INCIDENTS.forEach(incident => {
+        serverRef.current?.addReport({
           ...incident,
-          reportedAt: new Date(incident.reportedAt),
-          updatedAt: new Date(incident.updatedAt),
-          estimatedResolution: incident.estimatedResolution 
-            ? new Date(incident.estimatedResolution) 
-            : undefined
-        }));
-        setIncidents(processedIncidents);
-      } else {
-        // Si no hay datos, usar ejemplos
-        setIncidents(EXAMPLE_INCIDENTS);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(EXAMPLE_INCIDENTS));
-      }
-    } catch (error) {
-      console.error('Error loading incidents:', error);
-      setIncidents(EXAMPLE_INCIDENTS);
+          reportedAt: incident.reportedAt.toISOString(),
+          updatedAt: incident.updatedAt.toISOString()
+        });
+      });
     }
-    setLoading(false);
+
+    // Cleanup
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  // Guardar en localStorage cuando cambien las incidencias
-  const saveIncidents = (newIncidents: IncidentReport[]) => {
-    setIncidents(newIncidents);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newIncidents));
-  };
+  // Cleanup al desmontar
+  useEffect(() => {
+    return () => {
+      // No destruir el servidor ya que es singleton y puede ser usado por otros componentes
+    };
+  }, []);
 
   const createIncident = (data: CreateIncidentData): IncidentReport => {
     const newIncident: IncidentReport = {
@@ -119,24 +133,33 @@ export const useIncidents = () => {
       updatedAt: new Date()
     };
 
-    const updatedIncidents = [...incidents, newIncident];
-    saveIncidents(updatedIncidents);
+    // Enviar al servidor
+    if (serverRef.current) {
+      const serverIncident = {
+        ...newIncident,
+        reportedAt: newIncident.reportedAt.toISOString(),
+        updatedAt: newIncident.updatedAt.toISOString()
+      };
+      serverRef.current.addReport(serverIncident);
+    }
     
     return newIncident;
   };
 
   const updateIncident = (id: string, updates: Partial<IncidentReport>) => {
-    const updatedIncidents = incidents.map(incident =>
-      incident.id === id
-        ? { ...incident, ...updates, updatedAt: new Date() }
-        : incident
-    );
-    saveIncidents(updatedIncidents);
+    if (serverRef.current) {
+      const serverUpdates = {
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+      serverRef.current.updateReport(id, serverUpdates);
+    }
   };
 
   const deleteIncident = (id: string) => {
-    const updatedIncidents = incidents.filter(incident => incident.id !== id);
-    saveIncidents(updatedIncidents);
+    if (serverRef.current) {
+      serverRef.current.deleteReport(id);
+    }
   };
 
   const getIncidentsByStatus = (status: IncidentStatus) => {

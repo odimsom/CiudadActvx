@@ -7,6 +7,7 @@ import { Coordinates, IncidentReport, CreateIncidentData } from '@ciudad-activa/
 import { IncidentFormModal } from './IncidentFormModal';
 import { MapLegend } from './MapLegend';
 import { IncidentDetailsPanel } from './IncidentDetailsPanel';
+import { RealtimeNotifications } from './RealtimeNotifications';
 import { useIncidents } from '../hooks/useIncidents';
 import { AppHeader } from './AppHeader';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -241,6 +242,9 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
           setSelectedIncident(null);
         }}
       />
+
+      {/* Notificaciones en tiempo real */}
+      <RealtimeNotifications />
 
       <AnimatePresence>
         {showToast && (

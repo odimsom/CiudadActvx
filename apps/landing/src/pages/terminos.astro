@@ -1,0 +1,61 @@
+---
+layout: '../../layouts/Layout.astro'
+---
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ciudad Activa - Términos y Condiciones</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Términos y Condiciones</h1>
+          <p class="text-gray-600">Ciudad Activa</p>
+        </div>
+      </div>
+
+      <div class="prose prose-gray max-w-none">
+        <h2>1. Aceptación de términos</h2>
+        <p>Al usar Ciudad Activa, aceptas estos términos y condiciones en su totalidad.</p>
+
+        <h2>2. Uso de la plataforma</h2>
+        <p>Ciudad Activa es una plataforma ciudadana para reportar problemas urbanos y dar seguimiento a su resolución.</p>
+
+        <h2>3. Responsabilidades del usuario</h2>
+        <ul>
+          <li>Proporcionar información veraz y precisa</li>
+          <li>No usar la plataforma para fines ilegales</li>
+          <li>Respetar a otros usuarios</li>
+        </ul>
+
+        <h2>4. Privacidad</h2>
+        <p>Respetamos tu privacidad. Los datos se almacenan localmente y solo se comparten los reportes públicos.</p>
+
+        <h2>5. Modificaciones</h2>
+        <p>Nos reservamos el derecho a modificar estos términos en cualquier momento.</p>
+      </div>
+
+      <div class="mt-8 pt-8 border-t">
+        <a href="/" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Volver al inicio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
