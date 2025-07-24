@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd apps/landing && npm run build",
+  "outputDirectory": "apps/landing/dist",
+  "framework": "astro",
+  "installCommand": "npm install && cd apps/landing && npm install",
+  "devCommand": "cd apps/landing && npm run dev",
+  "functions": {
+    "apps/landing/src/pages/api/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "env": {
+    "PUBLIC_MAPBOX_TOKEN": "@mapbox_token"
+  }
+}
