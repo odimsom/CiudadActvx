@@ -1,7 +1,10 @@
 {
-  "buildCommand": "cd apps/landing && pnpm install && pnpm run build -- --config astro.config.vercel.mjs",
+  "buildCommand": "pnpm install && cd apps/landing && pnpm run build",
   "outputDirectory": "apps/landing/dist",
   "framework": "astro",
   "installCommand": "pnpm install",
-  "devCommand": "cd apps/landing && pnpm run dev"
+  "devCommand": "cd apps/landing && pnpm run dev",
+  "env": {
+    "PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoib2RpbXNvbSIsImEiOiJjbWRoOXcwa3cwMTg4MmtuOWdnaTVyamc0In0.5geWHeQ9BZQLSOSxW6OJ1A"
+  }
 }
