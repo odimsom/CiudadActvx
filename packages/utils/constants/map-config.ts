@@ -4,8 +4,8 @@ export const MAP_CONFIG = {
   
   // Default map settings
   DEFAULT_CENTER: {
-    lng: -74.0060, // Bogotá, Colombia (ajusta según tu ciudad)
-    lat: 4.7110
+    lng: -69.9312, // Santo Domingo, República Dominicana
+    lat: 18.4861
   },
   
   DEFAULT_ZOOM: 12,

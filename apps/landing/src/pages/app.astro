@@ -13,7 +13,7 @@ const title = "Ciudad Activa - App Web";
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#3B82F6">
   
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/src/styles/global.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   
   <style>
@@ -83,50 +83,90 @@ const title = "Ciudad Activa - App Web";
       // Intentar detectar si estamos en desarrollo o producción
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         // Desarrollo - intentar diferentes puertos comunes
-        const possiblePorts = [5173, 3000, 3001, 4173];
+        const possiblePorts = [5173, 3000, 3001, 4173, 8080];
+        let foundPort = false;
         
-        for (const port of possiblePorts) {
-          const testUrl = `http://localhost:${port}`;
-          fetch(testUrl, { mode: 'no-cors' })
-            .then(() => {
-              window.location.href = testUrl;
-            })
-            .catch(() => {
-              // Si falla, mostrar instrucciones
-              console.log(`Puerto ${port} no disponible`);
+        // Función para probar puertos
+        const tryPort = async (port) => {
+          try {
+            const response = await fetch(`http://localhost:${port}`, { 
+              mode: 'no-cors',
+              timeout: 1000 
             });
-        }
+            return true;
+          } catch {
+            return false;
+          }
+        };
         
-        // Si ningún puerto funciona, mostrar instrucciones
-        setTimeout(() => {
-          document.body.innerHTML = `
-            <div class="max-w-md mx-auto text-center p-8">
-              <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
-                <i data-lucide="alert-triangle" class="w-10 h-10 text-white"></i>
-              </div>
-              <h1 class="text-2xl font-bold text-gray-900 mb-4">Aplicación en desarrollo</h1>
-              <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-6">
-                <h3 class="font-semibold text-yellow-800 mb-2">Para desarrolladores:</h3>
-                <p class="text-sm text-yellow-700 mb-4">
-                  Para ejecutar la aplicación web, ejecuta estos comandos:
-                </p>
-                <div class="bg-gray-900 text-green-400 p-3 rounded-lg text-left text-sm font-mono">
-                  <div>cd apps/web</div>
-                  <div>npm run dev</div>
-                </div>
-              </div>
-              <button onclick="location.href='/'" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold">
-                Volver al inicio
-              </button>
-            </div>
-          `;
-          lucide.createIcons();
-        }, 3000);
+        // Intentar puertos uno por uno
+        const checkPorts = async () => {
+          for (const port of possiblePorts) {
+            try {
+              const img = new Image();
+              img.onload = () => {
+                window.location.href = `http://localhost:${port}`;
+                foundPort = true;
+              };
+              img.onerror = () => {
+                // Puerto no disponible, continuar
+              };
+              img.src = `http://localhost:${port}/favicon.ico?t=${Date.now()}`;
+              
+              // Esperar un poco antes de probar el siguiente puerto
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              if (foundPort) break;
+            } catch (error) {
+              console.log(`Puerto ${port} no disponible`);
+            }
+          }
+          
+          // Si no encuentra ningún puerto, mostrar instrucciones
+          if (!foundPort) {
+            setTimeout(showDevelopmentInstructions, 1000);
+          }
+        };
+        
+        checkPorts();
         
       } else {
         // Producción - apuntar a la URL de producción
         window.location.href = '/web-app'; // Ajustar según la configuración de producción
       }
+    }
+    
+    function showDevelopmentInstructions() {
+      document.body.innerHTML = `
+        <div class="max-w-md mx-auto text-center p-8">
+          <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+            <i data-lucide="alert-triangle" class="w-10 h-10 text-white"></i>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-900 mb-4">Aplicación en desarrollo</h1>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-6">
+            <h3 class="font-semibold text-yellow-800 mb-2">Para desarrolladores:</h3>
+            <p class="text-sm text-yellow-700 mb-4">
+              Para ejecutar la aplicación web, ejecuta estos comandos:
+            </p>
+            <div class="bg-gray-900 text-green-400 p-3 rounded-lg text-left text-sm font-mono">
+              <div>cd apps/web</div>
+              <div>npm run dev</div>
+            </div>
+            <p class="text-xs text-yellow-600 mt-2">
+              La aplicación estará disponible en http://localhost:5173
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="location.href='/'" class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-xl font-semibold">
+              Volver al inicio
+            </button>
+            <button onclick="location.reload()" class="flex-1 border border-gray-300 text-gray-700 px-4 py-3 rounded-xl font-semibold">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
     }
     
     // Intentar redirección automática después de 2 segundos

@@ -70,16 +70,16 @@ export class SimpleServer {
     ];
 
     const locations = [
-      { address: 'Calle 50 con Carrera 70', lat: 6.2476, lng: -75.5658 },
-      { address: 'Avenida El Poblado', lat: 6.2088, lng: -75.5690 },
-      { address: 'Centro de Medellín', lat: 6.2442, lng: -75.5742 },
-      { address: 'Barrio Laureles', lat: 6.2518, lng: -75.5906 },
-      { address: 'Universidad de Antioquia', lat: 6.2675, lng: -75.5686 },
+      { address: 'Calle El Conde, Zona Colonial', lat: 18.4861, lng: -69.9312 },
+      { address: 'Avenida 27 de Febrero', lat: 18.4896, lng: -69.9018 },
+      { address: 'Malecón de Santo Domingo', lat: 18.4707, lng: -69.8948 },
+      { address: 'Piantini', lat: 18.4747, lng: -69.9173 },
+      { address: 'Los Alcarrizos', lat: 18.5158, lng: -70.0142 },
     ];
 
     const type = types[Math.floor(Math.random() * types.length)];
     const location = locations[Math.floor(Math.random() * locations.length)];
-    const citizens = ['María Rodríguez', 'Carlos Pérez', 'Ana Gómez', 'Luis Martínez', 'Elena Vargas'];
+    const citizens = ['María Rodríguez', 'Carlos Pérez', 'Ana Gómez', 'Luis Martínez', 'Elena Vargas', 'José Fernández', 'Carmen Torres', 'Miguel Santos'];
 
     return {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),

@@ -26,26 +26,7 @@ const description = "Únete a miles de ciudadanos que están transformando su co
   <meta property="og:image" content="/og-image.jpg">
   
   <!-- Estilos -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'pulse-slow': 'pulse 4s ease-in-out infinite',
-            'bounce-slow': 'bounce 3s ease-in-out infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-20px)' }
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="/src/styles/global.css">
   
   <!-- Iconos de Lucide -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -142,7 +123,7 @@ const description = "Únete a miles de ciudadanos que están transformando su co
           
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-4">
-            <a href="#descargar" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+            <a href="/app" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
               <i data-lucide="smartphone" class="w-5 h-5"></i>
               Usar en tu móvil
               <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
@@ -309,7 +290,7 @@ const description = "Únete a miles de ciudadanos que están transformando su co
           
           <!-- Overlay de información -->
           <div class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-            <div class="text-sm font-semibold text-gray-800 mb-2">Mapa de Demo - Medellín</div>
+            <div class="text-sm font-semibold text-gray-800 mb-2">Mapa de Demo - Santo Domingo</div>
             <div class="flex items-center gap-4 text-xs">
               <div class="flex items-center gap-1">
                 <div class="w-2 h-2 bg-red-500 rounded-full"></div>
@@ -338,11 +319,11 @@ const description = "Únete a miles de ciudadanos que están transformando su co
         <div id="report-panel" class="hidden mt-6 bg-gray-50 rounded-2xl p-6">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Nuevo Reporte Simulado</h3>
           <div class="grid md:grid-cols-2 gap-4">
-            <div>
+            <div class="md:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación</label>
               <div class="bg-white p-3 rounded-lg border">
-                <p class="text-sm" id="report-location">Calle Example #123</p>
-                <p class="text-xs text-gray-500" id="report-coordinates">6.2442, -75.5742</p>
+                <p class="text-sm" id="report-location">Zona Colonial, Santo Domingo</p>
+                <p class="text-xs text-gray-500" id="report-coordinates">18.4861, -69.9312</p>
               </div>
             </div>
             <div>
@@ -499,19 +480,19 @@ const description = "Únete a miles de ciudadanos que están transformando su co
         <div class="grid md:grid-cols-3 gap-6">
           <div class="bg-white/5 rounded-2xl p-6">
             <h4 class="text-lg font-semibold mb-4">🔥 Zona más activa</h4>
-            <p class="text-2xl font-bold text-red-400 mb-1">Centro de Medellín</p>
+            <p class="text-2xl font-bold text-red-400 mb-1">Centro de Santo Domingo</p>
             <p class="text-sm text-gray-300">487 reportes este mes</p>
           </div>
           
           <div class="bg-white/5 rounded-2xl p-6">
             <h4 class="text-lg font-semibold mb-4">⚡ Respuesta más rápida</h4>
-            <p class="text-2xl font-bold text-green-400 mb-1">El Poblado</p>
+            <p class="text-2xl font-bold text-green-400 mb-1">Piantini</p>
             <p class="text-sm text-gray-300">1.2 días promedio</p>
           </div>
           
           <div class="bg-white/5 rounded-2xl p-6">
             <h4 class="text-lg font-semibold mb-4">📈 Mayor crecimiento</h4>
-            <p class="text-2xl font-bold text-blue-400 mb-1">Bello</p>
+            <p class="text-2xl font-bold text-blue-400 mb-1">Los Alcarrizos</p>
             <p class="text-sm text-gray-300">+89% nuevos usuarios</p>
           </div>
         </div>
@@ -614,9 +595,9 @@ const description = "Únete a miles de ciudadanos que están transformando su co
         <div>
           <h4 class="font-semibold mb-4">Contacto</h4>
           <ul class="space-y-2 text-gray-300">
-            <li>📧 contacto@ciudadactiva.co</li>
-            <li>📱 +57 300 123 4567</li>
-            <li>🏢 Medellín, Colombia</li>
+            <li>📧 contacto@ciudadactiva.do</li>
+            <li>📱 +1 809 123 4567</li>
+            <li>🏢 Santo Domingo, República Dominicana</li>
           </ul>
         </div>
       </div>
@@ -685,9 +666,9 @@ const description = "Únete a miles de ciudadanos que están transformando su co
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       
-      // Simular coordenadas
-      const lat = (6.2 + (y / rect.height) * 0.1).toFixed(6);
-      const lng = (-75.6 + (x / rect.width) * 0.1).toFixed(6);
+      // Simular coordenadas de Santo Domingo
+      const lat = (18.4 + (y / rect.height) * 0.2).toFixed(6);
+      const lng = (-70.0 + (x / rect.width) * 0.2).toFixed(6);
       
       // Crear nuevo marcador
       const marker = document.createElement('div');
@@ -698,7 +679,15 @@ const description = "Únete a miles de ciudadanos que están transformando su co
       demoMap.appendChild(marker);
       
       // Actualizar panel
-      reportLocation.textContent = `Calle Simulada #${Math.floor(Math.random() * 999)}`;
+      const addresses = [
+        'Zona Colonial, Santo Domingo',
+        'Piantini, Santo Domingo', 
+        'Malecón de Santo Domingo',
+        'Los Alcarrizos',
+        'Avenida 27 de Febrero'
+      ];
+      const randomAddress = addresses[Math.floor(Math.random() * addresses.length)];
+      reportLocation.textContent = randomAddress;
       reportCoordinates.textContent = `${lat}, ${lng}`;
       reportPanel?.classList.remove('hidden');
       

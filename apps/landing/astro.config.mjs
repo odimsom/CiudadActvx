@@ -8,6 +8,6 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false, // Evita conflictos con estilos personalizados
     }),
-    react()
+    react(),
   ],
 });
