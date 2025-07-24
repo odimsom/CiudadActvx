@@ -8,43 +8,6 @@ const description = "Únete a miles de ciudadanos que están transformando su co
 ---
 
 <Layout title={title} description={description}>
-  <!-- Hero Section -->
-  
-  <style>
-    .loader {
-      border: 4px solid #f3f4f6;
-      border-top: 4px solid #3B82F6;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
-    }
-    
-    .animate-float {
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    .animate-pulse-slow {
-      animation: pulse 4s ease-in-out infinite;
-    }
-    
-    .animate-bounce-slow {
-      animation: bounce 3s ease-in-out infinite;
-    }
-  </style>
-</head>
-
-<body class="bg-gray-50 overflow-x-hidden">
   <!-- Header con navegación -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,12 +98,12 @@ const description = "Únete a miles de ciudadanos que están transformando su co
           
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-4">
-            <a href="/app" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
-              <i data-lucide="smartphone" class="w-5 h-5"></i>
-              Usar en tu móvil
+            <a href="/web-app" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+              <i data-lucide="monitor" class="w-5 h-5"></i>
+              Abrir Web App
               <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
             </a>
-            <a href="#demo" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2">
+            <a href="/demo" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2">
               <i data-lucide="play" class="w-5 h-5"></i>
               Ver demo
             </a>
@@ -531,15 +494,15 @@ const description = "Únete a miles de ciudadanos que están transformando su co
       
       <!-- Botones de descarga/instalación -->
       <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-        <a href="/app" class="group bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3">
+        <a href="/mobile-app" class="group bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3">
           <i data-lucide="smartphone" class="w-6 h-6"></i>
-          Abrir en el móvil
+          App Móvil
           <i data-lucide="external-link" class="w-4 h-4 group-hover:rotate-45 transition-transform"></i>
         </a>
         
-        <a href="/app" class="group border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center gap-3">
+        <a href="/web-app" class="group border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center gap-3">
           <i data-lucide="monitor" class="w-6 h-6"></i>
-          Usar en escritorio
+          Web App
         </a>
       </div>
       

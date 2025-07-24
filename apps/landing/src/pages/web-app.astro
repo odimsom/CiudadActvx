@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Web App - Ciudad Activa">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="max-w-md mx-auto text-center p-8">
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">Web App</h1>
+        <p class="text-gray-600 mb-6">La aplicación web completa de Ciudad Activa está en desarrollo.</p>
+        
+        <div class="space-y-4">
+          <button onclick="window.open('http://localhost:3000', '_blank')" 
+                  class="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+            🚀 Abrir Versión Local (Puerto 3000)
+          </button>
+          
+          <a href="/" class="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+            ← Volver a Inicio
+          </a>
+        </div>
+        
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+          <p class="text-sm text-blue-700">
+            <strong>💡 Nota:</strong> La web app se ejecuta localmente en el puerto 3000. 
+            Asegúrate de tener el servidor de desarrollo ejecutándose.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

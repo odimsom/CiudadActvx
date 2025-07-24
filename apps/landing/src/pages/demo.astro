@@ -1,0 +1,220 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Demo - Ciudad Activa">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header simple -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+          <h1 class="text-lg font-bold text-gray-900">Ciudad Activa - Demo</h1>
+        </div>
+        <a href="/" class="text-blue-600 hover:text-blue-700 font-medium">← Volver</a>
+      </div>
+    </header>
+
+    <!-- Demo interactivo -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-4">Demo Interactivo</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Explora las funcionalidades principales de Ciudad Activa. Este es un demo que simula 
+          la experiencia real de la aplicación.
+        </p>
+      </div>
+
+      <!-- Grid de funcionalidades -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <!-- Crear reporte -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Crear Reporte</h3>
+          <p class="text-gray-600 mb-4">Reporta problemas en tu ciudad de forma rápida y sencilla.</p>
+          <button onclick="showDemo('create')" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">
+            Probar Demo
+          </button>
+        </div>
+
+        <!-- Ver mapa -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Explorar Mapa</h3>
+          <p class="text-gray-600 mb-4">Ve todos los reportes en un mapa interactivo de tu ciudad.</p>
+          <button onclick="showDemo('map')" class="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
+            Ver Mapa Demo
+          </button>
+        </div>
+
+        <!-- Seguimiento -->
+        <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Seguimiento</h3>
+          <p class="text-gray-600 mb-4">Recibe actualizaciones sobre el progreso de los reportes.</p>
+          <button onclick="showDemo('tracking')" class="w-full bg-purple-500 text-white py-2 px-4 rounded-lg hover:bg-purple-600 transition-colors">
+            Ver Seguimiento
+          </button>
+        </div>
+      </div>
+
+      <!-- Área de demo -->
+      <div id="demo-area" class="bg-white rounded-xl shadow-lg p-8 hidden">
+        <div class="text-center">
+          <div class="loader mx-auto mb-4"></div>
+          <p class="text-gray-600">Cargando demo...</p>
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="text-center bg-blue-50 rounded-xl p-8">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">¿Listo para usar la app completa?</h3>
+        <p class="text-gray-600 mb-6">
+          Este demo te da una idea de lo que puedes hacer. La aplicación completa incluye 
+          muchas más funcionalidades y se actualiza en tiempo real.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/web-app" class="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium">
+            Abrir Web App Completa
+          </a>
+          <a href="/mobile-app" class="border-2 border-blue-500 text-blue-500 px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors font-medium">
+            Ver App Móvil
+          </a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function showDemo(type) {
+      const demoArea = document.getElementById('demo-area');
+      demoArea.classList.remove('hidden');
+      demoArea.scrollIntoView({ behavior: 'smooth' });
+      
+      // Simular carga
+      setTimeout(() => {
+        let content = '';
+        
+        switch(type) {
+          case 'create':
+            content = `
+              <h3 class="text-xl font-semibold mb-4 text-green-600">🆕 Demo: Crear Reporte</h3>
+              <div class="bg-gray-50 rounded-lg p-6">
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de problema</label>
+                    <select class="w-full p-3 border border-gray-300 rounded-lg">
+                      <option>Alumbrado público</option>
+                      <option>Bache en la vía</option>
+                      <option>Basuras</option>
+                      <option>Semáforo dañado</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                    <textarea class="w-full p-3 border border-gray-300 rounded-lg" rows="3" placeholder="Describe el problema..."></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación</label>
+                    <input type="text" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="Av. Principal con Calle 5" />
+                  </div>
+                  <button class="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors">
+                    📤 Enviar Reporte
+                  </button>
+                </div>
+              </div>
+            `;
+            break;
+            
+          case 'map':
+            content = `
+              <h3 class="text-xl font-semibold mb-4 text-blue-600">🗺️ Demo: Mapa Interactivo</h3>
+              <div class="bg-gray-100 rounded-lg p-8 text-center">
+                <div class="bg-blue-500 text-white rounded-lg p-6 inline-block">
+                  <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  <p class="text-lg font-medium">Mapa de Santo Domingo</p>
+                  <p class="text-blue-100">47 reportes activos</p>
+                </div>
+                <div class="mt-6 grid grid-cols-2 gap-4">
+                  <div class="bg-red-100 p-3 rounded-lg">
+                    <div class="text-red-600 font-medium">🔴 Urgente: 3</div>
+                  </div>
+                  <div class="bg-yellow-100 p-3 rounded-lg">
+                    <div class="text-yellow-600 font-medium">🟡 Pendiente: 12</div>
+                  </div>
+                  <div class="bg-blue-100 p-3 rounded-lg">
+                    <div class="text-blue-600 font-medium">🔵 En progreso: 8</div>
+                  </div>
+                  <div class="bg-green-100 p-3 rounded-lg">
+                    <div class="text-green-600 font-medium">🟢 Resuelto: 24</div>
+                  </div>
+                </div>
+              </div>
+            `;
+            break;
+            
+          case 'tracking':
+            content = `
+              <h3 class="text-xl font-semibold mb-4 text-purple-600">⚡ Demo: Seguimiento en Tiempo Real</h3>
+              <div class="space-y-4">
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                  <div class="flex items-center">
+                    <div class="text-green-500 mr-3">✅</div>
+                    <div>
+                      <p class="font-medium">Reporte #1234 - Resuelto</p>
+                      <p class="text-sm text-gray-600">Alumbrado público reparado en Av. Principal</p>
+                      <p class="text-xs text-gray-500">Hace 2 horas</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                  <div class="flex items-center">
+                    <div class="text-blue-500 mr-3">🔧</div>
+                    <div>
+                      <p class="font-medium">Reporte #1235 - En progreso</p>
+                      <p class="text-sm text-gray-600">Bache siendo reparado en Calle 8</p>
+                      <p class="text-xs text-gray-500">Actualizado hace 30 min</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                  <div class="flex items-center">
+                    <div class="text-yellow-500 mr-3">⏳</div>
+                    <div>
+                      <p class="font-medium">Reporte #1236 - Pendiente</p>
+                      <p class="text-sm text-gray-600">Basuras acumuladas en Parque Central</p>
+                      <p class="text-xs text-gray-500">Reportado hace 1 día</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+            break;
+        }
+        
+        demoArea.innerHTML = content;
+      }, 1500);
+    }
+  </script>
+</Layout>

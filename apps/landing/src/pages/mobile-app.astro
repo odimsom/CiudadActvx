@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Mobile App - Ciudad Activa">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="max-w-md mx-auto text-center p-8">
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">Mobile App</h1>
+        <p class="text-gray-600 mb-6">La aplicación móvil de Ciudad Activa está en desarrollo.</p>
+        
+        <div class="space-y-4">
+          <div class="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-lg">
+            📱 Próximamente en App Store y Google Play
+          </div>
+          
+          <a href="/" class="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+            ← Volver a Inicio
+          </a>
+        </div>
+        
+        <div class="mt-6 p-4 bg-green-50 rounded-lg">
+          <p class="text-sm text-green-700">
+            <strong>🚀 Estado:</strong> La app móvil se encuentra en fase de desarrollo. 
+            Por ahora puedes usar la versión PWA instalable desde el navegador.
+          </p>
+        </div>
+        
+        <div class="mt-4">
+          <h3 class="font-semibold text-gray-900 mb-2">Mientras tanto:</h3>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li>• Usa la versión web responsive</li>
+            <li>• Instala como PWA en tu dispositivo</li>
+            <li>• Accede desde cualquier navegador móvil</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
