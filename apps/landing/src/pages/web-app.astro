@@ -1,5 +1,37 @@
 ---
-import Layout from '../l        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+import Layout from '../l        ---
+import Layout from '../layouts/Layout.astro';
+---
+
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Web App - Ciudad Activa">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="max-w-md mx-auto text-center p-8">
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H13.5M15 5.25v6a2.25 2.25 0 01-2.25 2.25H5.25a2.25 2.25 0 01-2.25-2.25V5.25"></path>
+          </svg>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-gray-900 mb-4">Ciudad Activa Web App</h1>
+        <p class="text-gray-600 mb-6">La aplicación web completa está lista y funcionando. Incluye mapa interactivo, reportes en tiempo real y toda la funcionalidad.</p>
+        
+        <div class="space-y-4">
+          <button onclick="window.open('http://localhost:3000', '_blank')" 
+                  class="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+            🚀 Abrir Web App (localhost:3000)
+          </button>
+          
+          <a href="/" class="block w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors">
+            ← Volver a Inicio
+          </a>
+        </div>
+        
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
           <p class="text-sm text-blue-700">
             <strong>📍 Funcionalidades disponibles:</strong>
           </p>
@@ -19,7 +51,11 @@ import Layout from '../l        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
           <p class="text-xs text-green-600 mt-1">
             ⚡ Última actualización: 24 julio 2025
           </p>
-        </div>ro';
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>ro';
 ---
 
 <Layout title="Web App - Ciudad Activa">
