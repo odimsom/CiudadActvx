@@ -1,0 +1,20 @@
+{
+  "name": "@ciudad-activa/storage",
+  "version": "1.0.0",
+  "description": "Storage utilities for Ciudad Activa",
+  "main": "index.ts",
+  "types": "index.ts",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@ciudad-activa/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

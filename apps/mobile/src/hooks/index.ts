@@ -1,1 +1,0 @@
-export { useIncidents } from "./useIncidents";

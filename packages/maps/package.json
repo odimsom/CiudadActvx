@@ -4,8 +4,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./components/index.ts",
-  "types": "./components/index.ts",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./components/*": "./components/*",
+    "./lib/*": "./lib/*"
+  },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },

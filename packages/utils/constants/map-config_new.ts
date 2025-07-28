@@ -20,9 +20,6 @@ export const MAP_CONFIG = {
   // Mapbox configuration
   MAPBOX_TOKEN: getMapboxToken(),
 
-  // Map style
-  MAP_STYLE: "mapbox://styles/mapbox/streets-v12",
-
   // Default map settings
   DEFAULT_CENTER: {
     lng: -69.9312, // Santo Domingo, República Dominicana
