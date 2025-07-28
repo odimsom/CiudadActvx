@@ -5,6 +5,7 @@ import {
   Tooltip, ResponsiveContainer
 } from 'recharts';
 import { useIncidents } from '../hooks/useIncidents';
+import { IncidentReport } from '@ciudad-activa/types';
 
 // --- Categorías oficiales, nombre y color (usa exactamente las mismas claves que llegan desde el backend) ---
 const CATEGORIES = [
@@ -55,14 +56,14 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ open, onClose 
   // -- Por prioridad
   const priorityCounts = PRIORITIES.map(p => ({
     name: p.label,
-    value: incidents.filter(i => i.priority === p.key).length,
+    value: incidents.filter((i: IncidentReport) => i.priority === p.key).length,
     color: p.color
   }));
 
   // -- Por categoría (con orden y colores exactos)
   const categoryCounts = CATEGORIES.map(cat => ({
     name: cat.label,
-    value: incidents.filter(i => i.type.category === cat.key).length,
+    value: incidents.filter((i: IncidentReport) => i.type.category === cat.key).length,
     color: cat.color
   }));
 

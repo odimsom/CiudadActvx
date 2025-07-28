@@ -9,7 +9,7 @@ interface MapViewProps {
 }
 
 export const MapView: React.FC<MapViewProps> = ({
-  className
+  className = ""
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -95,6 +95,7 @@ export const MapView: React.FC<MapViewProps> = ({
       {/* Map Container */}
       <div 
         ref={mapContainer} 
+        className={className}
         style={{
           position: 'absolute',
           top: 0,

@@ -1,182 +1,221 @@
-import { useState, useEffect, useRef } from 'react';
-import { IncidentReport, CreateIncidentData, IncidentStatus, IncidentPriority, IncidentCategory } from '@ciudad-activa/types';
-import { SimpleServer } from '../utils/simpleServer';
+import { useState, useEffect } from "react";
+import {
+  IncidentReport,
+  CreateIncidentData,
+  IncidentStatus,
+  IncidentPriority,
+  IncidentCategory,
+} from "@ciudad-activa/types";
+import { ApiService, type ApiIncident } from "../services/apiService";
 
-// Datos de ejemplo
-const EXAMPLE_INCIDENTS: IncidentReport[] = [
-  {
-    id: '1',
-    type: {
-      id: 'waste-garbage',
-      name: 'Basura acumulada',
-      icon: 'Trash2',
-      color: '#ef4444',
-      category: IncidentCategory.WASTE,
-      description: 'Acumulación de basura en espacios públicos'
-    },
-    title: 'Basura acumulada en parque central',
-    description: 'Gran cantidad de desechos en la entrada del parque',
-    coordinates: { lat: 18.4861, lng: -69.9312 },
-    address: 'Zona Colonial, Santo Domingo',
-    status: IncidentStatus.PENDING,
-    priority: IncidentPriority.HIGH,
-    reportedBy: 'Usuario Demo',
-    reportedAt: new Date('2024-06-15T10:30:00'),
-    updatedAt: new Date('2024-06-15T10:30:00')
+// Helper function to convert API incident to app format
+const convertApiIncidentToAppFormat = (
+  apiIncident: ApiIncident
+): IncidentReport => ({
+  id: apiIncident.id,
+  type: {
+    id: apiIncident.type.id,
+    name: apiIncident.type.name,
+    icon: apiIncident.type.icon as any,
+    color: apiIncident.type.color,
+    category: apiIncident.type.category as IncidentCategory,
+    description: apiIncident.type.description,
   },
-  {
-    id: '2',
-    type: {
-      id: 'infrastructure-pothole',
-      name: 'Bache en la vía',
-      icon: 'Construction',
-      color: '#f59e0b',
-      category: IncidentCategory.INFRASTRUCTURE,
-      description: 'Deterioro en la calzada'
-    },
-    title: 'Bache grande en Carrera 70',
-    description: 'Bache profundo que puede dañar vehículos',
-    coordinates: { lat: 6.2518, lng: -75.5636 },
-    address: 'Carrera 70 con Calle 50',
-    status: IncidentStatus.IN_PROGRESS,
-    priority: IncidentPriority.MEDIUM,
-    reportedBy: 'Ciudadano Activo',
-    reportedAt: new Date('2024-06-14T15:45:00'),
-    updatedAt: new Date('2024-06-16T09:20:00')
-  },
-  {
-    id: '3',
-    type: {
-      id: 'infrastructure-lighting',
-      name: 'Iluminación pública',
-      icon: 'Lightbulb',
-      color: '#fbbf24',
-      category: IncidentCategory.INFRASTRUCTURE,
-      description: 'Falla en el alumbrado'
-    },
-    title: 'Poste de luz fundido',
-    coordinates: { lat: 18.4747, lng: -69.9173 },
-    address: 'Piantini, Santo Domingo',
-    status: IncidentStatus.RESOLVED,
-    priority: IncidentPriority.LOW,
-    reportedBy: 'Vecino Preocupado',
-    reportedAt: new Date('2024-06-10T20:15:00'),
-    updatedAt: new Date('2024-06-17T14:30:00')
-  }
-];
+  title: apiIncident.title,
+  description: apiIncident.description,
+  coordinates: apiIncident.coordinates,
+  address: apiIncident.address,
+  status: apiIncident.status as IncidentStatus,
+  priority: apiIncident.priority as IncidentPriority,
+  reportedBy: apiIncident.reportedBy,
+  reportedAt: new Date(apiIncident.reportedAt),
+  updatedAt: new Date(apiIncident.updatedAt),
+  votes: apiIncident.votes,
+  views: apiIncident.views,
+  photos: apiIncident.photos,
+  tags: apiIncident.tags,
+});
 
-export const useIncidents = () => {
+export function useIncidents() {
   const [incidents, setIncidents] = useState<IncidentReport[]>([]);
   const [loading, setLoading] = useState(true);
-  const serverRef = useRef<SimpleServer | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Inicializar servidor y suscribirse a cambios
-  useEffect(() => {
-    serverRef.current = SimpleServer.getInstance();
-    
-    // Solicitar permisos de notificación
-    serverRef.current.requestNotificationPermission();
-    
-    // Suscribirse a actualizaciones del servidor
-    const unsubscribe = serverRef.current.subscribe((serverIncidents) => {
-      // Convertir datos del servidor a formato local
-      const processedIncidents = serverIncidents.map((incident: any) => ({
-        ...incident,
-        reportedAt: new Date(incident.reportedAt),
-        updatedAt: new Date(incident.updatedAt),
-        estimatedResolution: incident.estimatedResolution 
-          ? new Date(incident.estimatedResolution) 
-          : undefined
-      }));
-      
-      setIncidents(processedIncidents);
+  // Load incidents from API
+  const loadIncidents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const apiIncidents = await ApiService.getIncidents();
+      const convertedIncidents = apiIncidents.map(
+        convertApiIncidentToAppFormat
+      );
+      setIncidents(convertedIncidents);
+    } catch (err) {
+      console.error("Error loading incidents:", err);
+      setError(err instanceof Error ? err.message : "Failed to load incidents");
+    } finally {
       setLoading(false);
-    });
-
-    // Inicializar con datos de ejemplo si no hay datos
-    const serverData = serverRef.current.getServerData();
-    if (serverData.length === 0) {
-      EXAMPLE_INCIDENTS.forEach(incident => {
-        serverRef.current?.addReport({
-          ...incident,
-          reportedAt: incident.reportedAt.toISOString(),
-          updatedAt: incident.updatedAt.toISOString()
-        });
-      });
     }
+  };
 
-    // Cleanup
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  // Cleanup al desmontar
+  // Initial load
   useEffect(() => {
-    return () => {
-      // No destruir el servidor ya que es singleton y puede ser usado por otros componentes
-    };
+    loadIncidents();
   }, []);
 
-  const createIncident = (data: CreateIncidentData): IncidentReport => {
-    const newIncident: IncidentReport = {
-      id: Date.now().toString(),
-      type: EXAMPLE_INCIDENTS[0].type, // Temporalmente usar el primer tipo
-      title: data.title,
-      description: data.description,
-      coordinates: data.coordinates,
-      status: IncidentStatus.PENDING,
-      priority: data.priority || IncidentPriority.MEDIUM,
-      photos: data.photos,
-      reportedBy: 'Usuario Actual',
-      reportedAt: new Date(),
-      updatedAt: new Date()
-    };
+  const addIncident = async (data: CreateIncidentData): Promise<string> => {
+    try {
+      setError(null);
 
-    // Enviar al servidor
-    if (serverRef.current) {
-      const serverIncident = {
-        ...newIncident,
-        reportedAt: newIncident.reportedAt.toISOString(),
-        updatedAt: newIncident.updatedAt.toISOString()
+      // We need to get the type information from the typeId
+      // For now, we'll create a mapping of common types
+      const typeMapping: Record<
+        string,
+        { name: string; icon: string; color: string; category: string }
+      > = {
+        "waste-garbage": {
+          name: "Basura acumulada",
+          icon: "Trash2",
+          color: "#ef4444",
+          category: "waste",
+        },
+        "roads-pothole": {
+          name: "Bache en la vía",
+          icon: "Construction",
+          color: "#f59e0b",
+          category: "infrastructure",
+        },
+        "lighting-broken": {
+          name: "Alumbrado dañado",
+          icon: "Lightbulb",
+          color: "#8b5cf6",
+          category: "infrastructure",
+        },
+        "water-leak": {
+          name: "Fuga de agua",
+          icon: "Droplets",
+          color: "#3b82f6",
+          category: "infrastructure",
+        },
+        "safety-vandalism": {
+          name: "Vandalismo",
+          icon: "Shield",
+          color: "#dc2626",
+          category: "safety",
+        },
       };
-      serverRef.current.addReport(serverIncident);
-    }
-    
-    return newIncident;
-  };
 
-  const updateIncident = (id: string, updates: Partial<IncidentReport>) => {
-    if (serverRef.current) {
-      const serverUpdates = {
-        ...updates,
-        updatedAt: new Date().toISOString()
+      const typeInfo = typeMapping[data.typeId] || {
+        name: "Incidencia",
+        icon: "AlertTriangle",
+        color: "#6b7280",
+        category: "other",
       };
-      serverRef.current.updateReport(id, serverUpdates);
+
+      const apiData = {
+        title: data.title,
+        description: data.description,
+        typeId: data.typeId,
+        typeName: typeInfo.name,
+        typeIcon: typeInfo.icon,
+        typeColor: typeInfo.color,
+        typeCategory: typeInfo.category,
+        latitude: data.coordinates.lat,
+        longitude: data.coordinates.lng,
+        address: "", // Will be filled by geocoding if available
+        priority: data.priority || "medium",
+        reportedBy: "Usuario Web", // Default user
+        photos: data.photos || [],
+        tags: [], // Default empty tags
+      };
+
+      const result = await ApiService.createIncident(apiData);
+
+      // Reload incidents to get the updated list
+      await loadIncidents();
+
+      return result.id;
+    } catch (err) {
+      console.error("Error creating incident:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create incident";
+      setError(errorMessage);
+      throw new Error(errorMessage);
     }
   };
 
-  const deleteIncident = (id: string) => {
-    if (serverRef.current) {
-      serverRef.current.deleteReport(id);
+  const updateIncidentStatus = async (
+    id: string,
+    status: IncidentStatus
+  ): Promise<void> => {
+    try {
+      setError(null);
+      // Update local state optimistically
+      setIncidents((prev) =>
+        prev.map((incident) =>
+          incident.id === id
+            ? { ...incident, status, updatedAt: new Date() }
+            : incident
+        )
+      );
+
+      // TODO: Add API endpoint for updating incident status when backend supports it
+      console.log(
+        `Status update for incident ${id} to ${status} - API endpoint not yet implemented`
+      );
+    } catch (err) {
+      console.error("Error updating incident status:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to update incident status"
+      );
+      // Reload incidents to restore correct state
+      await loadIncidents();
     }
   };
 
-  const getIncidentsByStatus = (status: IncidentStatus) => {
-    return incidents.filter(incident => incident.status === status);
+  const voteOnIncident = async (
+    id: string,
+    action: "up" | "down"
+  ): Promise<void> => {
+    try {
+      setError(null);
+
+      // Update local state optimistically
+      setIncidents((prev) =>
+        prev.map((incident) =>
+          incident.id === id
+            ? {
+                ...incident,
+                votes: (incident.votes || 0) + (action === "up" ? 1 : -1),
+                updatedAt: new Date(),
+              }
+            : incident
+        )
+      );
+
+      await ApiService.voteIncident(id, action);
+    } catch (err) {
+      console.error("Error voting on incident:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to vote on incident"
+      );
+      // Reload incidents to restore correct state
+      await loadIncidents();
+    }
   };
 
-  const getIncidentsByPriority = (priority: IncidentPriority) => {
-    return incidents.filter(incident => incident.priority === priority);
+  const refreshIncidents = async (): Promise<void> => {
+    await loadIncidents();
   };
 
   return {
     incidents,
     loading,
-    createIncident,
-    updateIncident,
-    deleteIncident,
-    getIncidentsByStatus,
-    getIncidentsByPriority
+    error,
+    addIncident,
+    updateIncidentStatus,
+    voteOnIncident,
+    refreshIncidents,
   };
-};
+}

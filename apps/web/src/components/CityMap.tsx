@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import type { FeatureCollection } from 'geojson';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMapbox } from '@ciudad-activa/maps/hooks/useMapbox';
+import { useMapbox } from '@ciudad-activa/maps';
 import { Coordinates, IncidentReport, CreateIncidentData } from '@ciudad-activa/types';
 import { IncidentFormModal } from './IncidentFormModal';
 import { MapLegend } from './MapLegend';
@@ -22,7 +22,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   const markersRef = useRef<{ id: string; marker: mapboxgl.Marker }[]>([]);
 
   const { viewport, isLoaded, mapboxToken } = useMapbox();
-  const { incidents, createIncident } = useIncidents();
+  const { incidents, addIncident } = useIncidents();
 
   const [mostrarHeatmap, setMostrarHeatmap] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState<Coordinates | null>(null);
@@ -71,7 +71,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     markersRef.current.forEach(({ marker }) => marker.remove());
     markersRef.current = [];
 
-    incidents.forEach((incident) => {
+    incidents.forEach((incident: IncidentReport) => {
       const el = document.createElement('div');
       el.className = 'incident-marker';
       el.style.cssText = `
@@ -106,7 +106,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     const mapRef = map.current;
     const geojsonData: FeatureCollection = {
       type: 'FeatureCollection',
-      features: incidents.map((i) => ({
+      features: incidents.map((i: IncidentReport) => ({
         type: 'Feature',
         geometry: {
           type: 'Point',
@@ -222,7 +222,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
             setSelectedCoordinates(null);
           }}
           onSubmit={async (data: CreateIncidentData) => {
-            await createIncident(data);
+            await addIncident(data);
             setIsFormModalOpen(false);
             setSelectedCoordinates(null);
             setShowToast(true);
