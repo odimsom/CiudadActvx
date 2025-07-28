@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ciudad-activa-api
+    env: node
+    buildCommand: cd apps/server && npm install && npm run build
+    startCommand: cd apps/server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    autoDeploy: false

@@ -105,7 +105,7 @@ async function startServer() {
     console.log("🔄 Iniciando Ciudad Activa API...");
     console.log(`📊 Ambiente: ${NODE_ENV}`);
     console.log(`🔧 Puerto configurado: ${PORT}`);
-    
+
     // Inicializar base de datos
     database.initialize();
     console.log("✅ Base de datos inicializada correctamente");
@@ -120,7 +120,6 @@ async function startServer() {
 
     // Configurar timeout para el servidor
     server.timeout = 60000;
-    
   } catch (error) {
     console.error("❌ Error al iniciar el servidor:", error);
     process.exit(1);
