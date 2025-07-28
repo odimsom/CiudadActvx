@@ -15,7 +15,7 @@ export class Database {
         throw err;
       }
       console.log("Connected to SQLite database");
-      
+
       // Crear tablas después de que la conexión esté establecida
       this.createTables();
       this.insertInitialData();
@@ -47,7 +47,8 @@ export class Database {
     // Ejecutar en modo serialize para evitar problemas de concurrencia
     this.db.serialize(() => {
       // Tabla de incidentes
-      this.db!.run(`
+      this.db!.run(
+        `
         CREATE TABLE IF NOT EXISTS incidents (
           id TEXT PRIMARY KEY,
           title TEXT NOT NULL,
@@ -70,16 +71,19 @@ export class Database {
           photos TEXT,
           tags TEXT
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating incidents table:', err);
-        } else {
-          console.log('Incidents table created successfully');
+      `,
+        (err) => {
+          if (err) {
+            console.error("Error creating incidents table:", err);
+          } else {
+            console.log("Incidents table created successfully");
+          }
         }
-      });
+      );
 
       // Tabla de estadísticas
-      this.db!.run(`
+      this.db!.run(
+        `
         CREATE TABLE IF NOT EXISTS statistics (
           id INTEGER PRIMARY KEY,
           total_incidents INTEGER DEFAULT 0,
@@ -88,16 +92,19 @@ export class Database {
           resolved_incidents INTEGER DEFAULT 0,
           updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating statistics table:', err);
-        } else {
-          console.log('Statistics table created successfully');
+      `,
+        (err) => {
+          if (err) {
+            console.error("Error creating statistics table:", err);
+          } else {
+            console.log("Statistics table created successfully");
+          }
         }
-      });
+      );
 
       // Tabla de notificaciones
-      this.db!.run(`
+      this.db!.run(
+        `
         CREATE TABLE IF NOT EXISTS notifications (
           id TEXT PRIMARY KEY,
           incident_id TEXT,
@@ -108,13 +115,15 @@ export class Database {
           read_at TEXT,
           FOREIGN KEY (incident_id) REFERENCES incidents (id)
         )
-      `, (err) => {
-        if (err) {
-          console.error('Error creating notifications table:', err);
-        } else {
-          console.log('Notifications table created successfully');
+      `,
+        (err) => {
+          if (err) {
+            console.error("Error creating notifications table:", err);
+          } else {
+            console.log("Notifications table created successfully");
+          }
         }
-      });
+      );
     });
   }
 
@@ -123,16 +132,19 @@ export class Database {
 
     // Insertar estadísticas iniciales después de crear las tablas
     setTimeout(() => {
-      this.db!.run(`
+      this.db!.run(
+        `
         INSERT OR IGNORE INTO statistics (id, total_incidents, pending_incidents, in_progress_incidents, resolved_incidents)
         VALUES (1, 0, 0, 0, 0)
-      `, (err) => {
-        if (err) {
-          console.error('Error inserting initial statistics:', err);
-        } else {
-          console.log('Initial statistics inserted successfully');
+      `,
+        (err) => {
+          if (err) {
+            console.error("Error inserting initial statistics:", err);
+          } else {
+            console.log("Initial statistics inserted successfully");
+          }
         }
-      });
+      );
     }, 100); // Pequeño delay para asegurar que las tablas estén creadas
   }
 }
