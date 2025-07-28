@@ -9,7 +9,7 @@ import routes from "./routes";
 // Cargar variables de entorno
 dotenv.config();
 
-const PORT = process.env.PORT || 3333;
+const PORT = parseInt(process.env.PORT || "3333", 10);
 const NODE_ENV = process.env.NODE_ENV || "development";
 
 // Crear aplicación Express
@@ -102,19 +102,27 @@ app.use("*", (req, res) => {
 // Inicializar base de datos y servidor
 async function startServer() {
   try {
+    console.log("🔄 Iniciando Ciudad Activa API...");
+    console.log(`📊 Ambiente: ${NODE_ENV}`);
+    console.log(`🔧 Puerto configurado: ${PORT}`);
+    
     // Inicializar base de datos
     database.initialize();
-    console.log("Base de datos inicializada correctamente");
+    console.log("✅ Base de datos inicializada correctamente");
 
     // Iniciar servidor
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Ciudad Activa API corriendo en puerto ${PORT}`);
-      console.log(`📊 Ambiente: ${NODE_ENV}`);
-      console.log(`🌐 URL: http://localhost:${PORT}`);
-      console.log(`📋 API Docs: http://localhost:${PORT}/api/health`);
+      console.log(`🌐 URL: http://0.0.0.0:${PORT}`);
+      console.log(`📋 Health Check: http://0.0.0.0:${PORT}/api/health`);
+      console.log("✅ Servidor listo para recibir conexiones");
     });
+
+    // Configurar timeout para el servidor
+    server.timeout = 60000;
+    
   } catch (error) {
-    console.error("Error al iniciar el servidor:", error);
+    console.error("❌ Error al iniciar el servidor:", error);
     process.exit(1);
   }
 }
