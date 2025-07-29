@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Menu, Bell } from 'lucide-react';
+import { Menu, Bell } from 'lucide-react';
 import { EmergencyPanel } from './EmergencyPanel';
 import { StatisticsPanel } from './StatisticsPanel';
 import { Notifications, Notification } from './Notifications';
@@ -44,9 +44,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <div className="px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-              <MapPin className="w-6 h-6 text-white" />
-            </div>
+            <img 
+              src="https://i.ibb.co/qYMMY6dC/LogoCiudadActiva.jpg" 
+              alt="Ciudad Activa Logo" 
+              className="w-10 h-10 rounded-xl shadow-lg object-cover"
+            />
             <div>
               <h1 className="text-lg font-bold text-gray-900">Ciudad Activa</h1>
               <p className="text-xs text-gray-500">Reporta y mejora tu ciudad</p>
