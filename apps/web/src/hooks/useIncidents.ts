@@ -10,31 +10,35 @@ import { ApiService, type ApiIncident } from "../services/apiService";
 
 // Helper function to convert API incident to app format
 const convertApiIncidentToAppFormat = (
-  apiIncident: ApiIncident
-): IncidentReport => ({
-  id: apiIncident.id,
-  type: {
-    id: apiIncident.type.id,
-    name: apiIncident.type.name,
-    icon: apiIncident.type.icon as any,
-    color: apiIncident.type.color,
-    category: apiIncident.type.category as IncidentCategory,
-    description: apiIncident.type.description,
-  },
-  title: apiIncident.title,
-  description: apiIncident.description,
-  coordinates: apiIncident.coordinates,
-  address: apiIncident.address,
-  status: apiIncident.status as IncidentStatus,
-  priority: apiIncident.priority as IncidentPriority,
-  reportedBy: apiIncident.reportedBy,
-  reportedAt: new Date(apiIncident.reportedAt),
-  updatedAt: new Date(apiIncident.updatedAt),
-  votes: apiIncident.votes,
-  views: apiIncident.views,
-  photos: apiIncident.photos,
-  tags: apiIncident.tags,
-});
+  apiIncident: any // Cambiamos a any temporalmente para debug
+): IncidentReport => {
+  console.log("🔄 Convirtiendo incidente:", apiIncident);
+
+  return {
+    id: apiIncident.id,
+    type: {
+      id: apiIncident.type?.id || "unknown",
+      name: apiIncident.type?.name || "Incidencia",
+      icon: apiIncident.type?.icon || "AlertTriangle",
+      color: apiIncident.type?.color || "#6b7280",
+      category: apiIncident.type?.category || "other",
+      description: apiIncident.type?.description || "",
+    },
+    title: apiIncident.title || "Sin título",
+    description: apiIncident.description || "",
+    coordinates: apiIncident.coordinates || { lat: 0, lng: 0 },
+    address: apiIncident.address || "",
+    status: apiIncident.status || "pending",
+    priority: apiIncident.priority || "medium",
+    reportedBy: apiIncident.reportedBy || "Usuario",
+    reportedAt: new Date(apiIncident.reportedAt || Date.now()),
+    updatedAt: new Date(apiIncident.updatedAt || Date.now()),
+    votes: apiIncident.votes || 0,
+    views: apiIncident.views || 0,
+    photos: apiIncident.photos || [],
+    tags: apiIncident.tags || [],
+  };
+};
 
 export function useIncidents() {
   console.log("🎯 useIncidents: Hook inicializado");
