@@ -44,7 +44,7 @@ interface StatisticsPanelProps {
 
 export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ open, onClose }) => {
   const { incidents } = useIncidents();
-  const { statistics, loading: statsLoading } = useStatistics();
+  const { statistics } = useStatistics();
 
   // Estadísticas generales del servidor
   const statusCounts = statistics ? [

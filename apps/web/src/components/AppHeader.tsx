@@ -6,13 +6,11 @@ import { Notifications, Notification } from './Notifications';
 import { useNotifications } from '../hooks/useNotifications';
 
 interface AppHeaderProps {
-  incidentCount?: number;
   mostrarHeatmap: boolean;
   onToggleHeatmap: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
-  incidentCount = 0,
   mostrarHeatmap,
   onToggleHeatmap,
 }) => {
@@ -24,16 +22,13 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   // Usar el hook real de notificaciones
   const { 
     notifications, 
-    loading: notificationsLoading, 
-    markAsRead, 
-    markAllAsRead, 
     getUnreadCount 
   } = useNotifications();
 
   // Convertir notificaciones para el componente Notifications
   const convertedNotifications: Notification[] = notifications.map(notif => ({
     id: notif.id,
-    type: notif.type,
+    type: notif.type === 'info' ? 'incident' : notif.type, // Convertir 'info' a 'incident' para compatibilidad
     title: notif.title,
     message: notif.message,
     createdAt: notif.createdAt,
@@ -121,7 +116,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <EmergencyPanel
         open={emergencyOpen}
         onClose={() => setEmergencyOpen(false)}
-        onSubmit={(data) => {
+        onSubmit={() => {
           // En lugar de manejar localmente, podrías hacer una llamada a la API
           // para crear una emergencia real y recibir notificaciones del servidor
           alert('✅ ¡Gracias por reportar esta emergencia! Estamos tomando acciones.');

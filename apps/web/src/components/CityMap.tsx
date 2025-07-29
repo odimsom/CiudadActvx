@@ -290,7 +290,6 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
       style={{ touchAction: 'pan-x pan-y' }}
     >
       <AppHeader
-        incidentCount={incidents.length}
         mostrarHeatmap={mostrarHeatmap}
         onToggleHeatmap={() => setMostrarHeatmap(prev => !prev)}
       />
