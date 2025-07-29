@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Menu, Bell } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, Bell, Download } from 'lucide-react';
 import { EmergencyPanel } from './EmergencyPanel';
 import { StatisticsPanel } from './StatisticsPanel';
 import { Notifications, Notification } from './Notifications';
@@ -18,12 +18,51 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [notificacionesAbiertas, setNotificacionesAbiertas] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [canInstall, setCanInstall] = useState(false);
   
   // Usar el hook real de notificaciones
   const { 
     notifications, 
     getUnreadCount 
   } = useNotifications();
+
+  // PWA Installation logic
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      setDeferredPrompt(e);
+      setCanInstall(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    // Show the install prompt
+    deferredPrompt.prompt();
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      console.log('User accepted the install prompt');
+    } else {
+      console.log('User dismissed the install prompt');
+    }
+
+    // Clear the deferredPrompt for next time
+    setDeferredPrompt(null);
+    setCanInstall(false);
+  };
 
   const unreadCount = getUnreadCount();
   console.log("🔴 AppHeader - Total notificaciones:", notifications.length);
@@ -90,6 +129,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
         {menuAbierto && (
           <div className="absolute top-16 right-4 w-64 bg-white shadow-xl border border-gray-200 rounded-lg z-50 p-4 space-y-3">
+            {canInstall && (
+              <button
+                onClick={() => {
+                  handleInstallClick();
+                  setMenuAbierto(false);
+                }}
+                className="w-full text-left px-4 py-2 rounded bg-green-100 hover:bg-green-200 font-medium text-green-700 flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Instalar App
+              </button>
+            )}
+
             <button
               onClick={onToggleHeatmap}
               className="w-full text-left px-4 py-2 rounded bg-blue-100 hover:bg-blue-200 font-medium text-blue-700"

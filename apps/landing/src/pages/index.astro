@@ -11,13 +11,7 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
   <!-- Header con navegación -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center          <h4 class="font-semibold mb-4">Tecnología</h4>
-          <ul class="space-y-2 text-gray-300">
-            <li>🚀 React & TypeScript</li>
-            <li>🗺️ Mapbox Integration</li>
-            <li>🇩🇴 República Dominicana</li>
-            <li>📱 PWA Ready</li>
-          </ul>y-between h-16">
+      <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center gap-3">
           <img src="https://i.ibb.co/qYMMY6dC/LogoCiudadActiva.jpg" alt="Ciudad Activa Logo" class="w-10 h-10 rounded-xl shadow-lg object-cover">
@@ -479,70 +473,6 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
     </div>
   </section>
 
-  <!-- Estadísticas en tiempo real -->
-  <section id="estadisticas" class="py-20 bg-gradient-to-br from-gray-900 to-blue-900 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl lg:text-4xl font-bold mb-4">
-          Impacto en números
-        </h2>
-        <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-          Estos son los números reales de cómo Ciudad Activa está transformando nuestras comunidades.
-        </p>
-      </div>
-      
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div class="text-center">
-          <div class="text-4xl lg:text-5xl font-bold text-blue-400 mb-2" id="stat-reports">2,847</div>
-          <div class="text-lg text-gray-300 mb-2">Reportes totales</div>
-          <div class="text-sm text-gray-400">↑ 12% este mes</div>
-        </div>
-        
-        <div class="text-center">
-          <div class="text-4xl lg:text-5xl font-bold text-green-400 mb-2" id="stat-resolved">1,956</div>
-          <div class="text-lg text-gray-300 mb-2">Problemas resueltos</div>
-          <div class="text-sm text-gray-400">↑ 28% este mes</div>
-        </div>
-        
-        <div class="text-center">
-          <div class="text-4xl lg:text-5xl font-bold text-purple-400 mb-2" id="stat-users">15,492</div>
-          <div class="text-lg text-gray-300 mb-2">Ciudadanos activos</div>
-          <div class="text-sm text-gray-400">↑ 45% este mes</div>
-        </div>
-        
-        <div class="text-center">
-          <div class="text-4xl lg:text-5xl font-bold text-yellow-400 mb-2" id="stat-time">2.3</div>
-          <div class="text-lg text-gray-300 mb-2">Días promedio resolución</div>
-          <div class="text-sm text-gray-400">↓ 18% este mes</div>
-        </div>
-      </div>
-      
-      <!-- Mapa de calor -->
-      <div class="mt-16 bg-white/10 backdrop-blur-sm rounded-3xl p-8">
-        <h3 class="text-2xl font-bold text-center mb-8">Actividad por zonas</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="bg-white/5 rounded-2xl p-6">
-            <h4 class="text-lg font-semibold mb-4">🔥 Zona más activa</h4>
-            <p class="text-2xl font-bold text-red-400 mb-1">Centro de Santo Domingo</p>
-            <p class="text-sm text-gray-300">487 reportes este mes</p>
-          </div>
-          
-          <div class="bg-white/5 rounded-2xl p-6">
-            <h4 class="text-lg font-semibold mb-4">⚡ Respuesta más rápida</h4>
-            <p class="text-2xl font-bold text-green-400 mb-1">Piantini</p>
-            <p class="text-sm text-gray-300">1.2 días promedio</p>
-          </div>
-          
-          <div class="bg-white/5 rounded-2xl p-6">
-            <h4 class="text-lg font-semibold mb-4">📈 Mayor crecimiento</h4>
-            <p class="text-2xl font-bold text-blue-400 mb-1">Los Alcarrizos</p>
-            <p class="text-sm text-gray-300">+89% nuevos usuarios</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Call to Action final -->
   <section id="descargar" class="py-20 bg-gradient-to-br from-blue-500 via-purple-600 to-blue-700 text-white relative overflow-hidden">
     <!-- Elementos decorativos -->
@@ -725,39 +655,6 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
     
     mobileMenuButton?.addEventListener('click', () => {
       mobileMenu?.classList.toggle('hidden');
-    });
-    
-    // Contadores animados
-    function animateCounter(element, target, duration = 2000) {
-      const start = 0;
-      const increment = target / (duration / 16);
-      let current = start;
-      
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          current = target;
-          clearInterval(timer);
-        }
-        element.textContent = Math.floor(current).toLocaleString();
-      }, 16);
-    }
-    
-    // Observador para animar contadores cuando entren en vista
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const element = entry.target;
-          const targetValue = parseInt(element.textContent.replace(/,/g, ''));
-          animateCounter(element, targetValue);
-          counterObserver.unobserve(element);
-        }
-      });
-    });
-    
-    // Observar contadores
-    document.querySelectorAll('#counter-reports, #counter-resolved, #counter-users').forEach(el => {
-      counterObserver.observe(el);
     });
     
     // Demo interactivo del mapa
