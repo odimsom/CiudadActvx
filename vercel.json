@@ -1,5 +1,33 @@
 {
-  "framework": "astro",
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/landing/**",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "cd apps/landing && pnpm build",
+        "outputDirectory": "apps/landing/dist"
+      }
+    },
+    {
+      "src": "apps/web/**",
+      "use": "@vercel/static-build", 
+      "config": {
+        "buildCommand": "cd apps/web && pnpm build",
+        "outputDirectory": "apps/web/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/web/(.*)",
+      "dest": "/apps/web/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/landing/$1"
+    }
+  ],
   "env": {
     "PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoib2RpbXNvbSIsImEiOiJjbWRoOXcwa3cwMTg4MmtuOWdnaTVyamc0In0.5geWHeQ9BZQLSOSxW6OJ1A"
   }

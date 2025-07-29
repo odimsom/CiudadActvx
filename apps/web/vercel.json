@@ -1,9 +1,4 @@
 {
-  "buildCommand": "pnpm build",
-  "outputDirectory": "apps/web/dist",
-  "framework": "vite",
-  "installCommand": "pnpm install",
-  "devCommand": "pnpm dev",
   "env": {
     "PUBLIC_MAPBOX_TOKEN": "pk.eyJ1Ijoib2RpbXNvbSIsImEiOiJjbWRoOXcwa3cwMTg4MmtuOWdnaTVyamc0In0.5geWHeQ9BZQLSOSxW6OJ1A"
   }
