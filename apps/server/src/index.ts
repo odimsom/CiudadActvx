@@ -94,6 +94,7 @@ app.get("/", (req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       incidents: "/api/incidents",
+      emergencies: "/api/emergencies",
       statistics: "/api/statistics",
       notifications: "/api/notifications",
       health: "/api/health",

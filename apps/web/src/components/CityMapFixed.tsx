@@ -17,12 +17,14 @@ interface CityMapProps {
 export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   console.log("🗺️ CityMap: Componente renderizado/montado");
 
+  // Estados del mapa
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<Array<{ marker: mapboxgl.Marker; id: string }>>([]);
 
+  // Estados del componente
   const { incidents, addIncident } = useIncidents();
-  const { mapboxToken, viewport, isLoaded } = useMapbox();
+  const { mapboxToken, viewport, isLoaded, mapStyle } = useMapbox();
   
   const [mostrarHeatmap, setMostrarHeatmap] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState<Coordinates | null>(null);
@@ -31,6 +33,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
   const [mostrarToast, setMostrarToast] = useState(false);
 
+  // Handlers
   const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
     console.log("🗺️ Map click detected:", e.lngLat);
     const coords = { lat: e.lngLat.lat, lng: e.lngLat.lng };
@@ -38,6 +41,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     setIsFormModalOpen(true);
   }, []);
 
+  // Inicializar mapa
   useEffect(() => {
     if (!isLoaded || !mapContainer.current || map.current) return;
 
@@ -45,16 +49,22 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: mapStyle,
       center: [viewport.center.lng, viewport.center.lat],
       zoom: viewport.zoom
     });
 
     map.current.on('load', () => {
-      console.log("🗺️ Mapa cargado completamente");
       loadIncidentsOnMap();
+      if (mostrarHeatmap) applyHeatmapLayer();
     });
 
+    map.current.on('styledata', () => {
+      loadIncidentsOnMap();
+      if (mostrarHeatmap) applyHeatmapLayer();
+    });
+
+    // Agregar listener para clicks en el mapa
     map.current.on('click', handleMapClick);
 
     return () => {
@@ -63,24 +73,33 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
         map.current.remove();
       }
     };
-  }, [isLoaded, mapboxToken, viewport, handleMapClick]);
+  }, [isLoaded, mapboxToken, viewport, handleMapClick, mostrarHeatmap]);
 
   const loadIncidentsOnMap = useCallback(() => {
-    if (!map.current) return;
+    if (!map.current) {
+      console.log("🗺️ loadIncidentsOnMap: Map no disponible");
+      return;
+    }
     
-    console.log("🗺️ Cargando incidentes en mapa, total:", incidents.length);
+    console.log("🗺️ loadIncidentsOnMap: Cargando incidentes en mapa, total:", incidents.length);
+    const mapRef = map.current;
 
+    // Limpiar marcadores existentes
     markersRef.current.forEach(({ marker }) => marker.remove());
     markersRef.current = [];
 
     incidents.forEach((incident: IncidentReport, index) => {
-      console.log(`🔴 Marcador ${index + 1}:`, {
+      console.log(`🗺️ Creando marcador ${index + 1}:`, {
         id: incident.id,
+        title: incident.title,
+        coordinates: incident.coordinates,
+        category: incident.type.category,
         color: incident.type.color,
-        category: incident.type.category
+        fullType: incident.type
       });
 
       const el = document.createElement('div');
+      el.className = 'incident-marker';
       el.style.cssText = `
         width: 24px;
         height: 24px;
@@ -96,7 +115,6 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
         font-weight: bold;
         font-size: 10px;
       `;
-      el.innerHTML = (index + 1).toString();
 
       el.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -106,7 +124,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
 
       const marker = new mapboxgl.Marker(el)
         .setLngLat([incident.coordinates.lng, incident.coordinates.lat])
-        .addTo(map.current!);
+        .addTo(mapRef);
 
       markersRef.current.push({ marker, id: incident.id });
     });
@@ -115,12 +133,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   }, [incidents]);
 
   const applyHeatmapLayer = useCallback(() => {
-    console.log("🔥 Aplicando heatmap...");
-    
-    if (!map.current || !incidents.length) {
-      console.log("🔥 No se puede aplicar heatmap");
-      return;
-    }
+    if (!map.current || !incidents.length) return;
 
     const geojsonData = {
       type: 'FeatureCollection',
@@ -131,7 +144,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
           coordinates: [incident.coordinates.lng, incident.coordinates.lat]
         },
         properties: {
-          intensity: incident.priority === 'urgent' ? 3 : 2
+          intensity: incident.priority === 'urgent' ? 3 : incident.priority === 'high' ? 2 : 1
         }
       }))
     };
@@ -139,76 +152,51 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     const sourceId = 'incidents-heatmap';
     const layerId = 'incidents-heatmap-layer';
 
-    try {
-      // Remover existentes
-      if (map.current.getLayer && map.current.getLayer(layerId)) {
-        map.current.removeLayer(layerId);
-      }
-      if (map.current.getSource && map.current.getSource(sourceId)) {
-        map.current.removeSource(sourceId);
-      }
-
-      // Agregar nuevos
-      map.current.addSource(sourceId, {
-        type: 'geojson',
-        data: geojsonData as any
-      });
-
-      map.current.addLayer({
-        id: layerId,
-        type: 'heatmap',
-        source: sourceId,
-        paint: {
-          'heatmap-weight': 1,
-          'heatmap-intensity': 1,
-          'heatmap-color': [
-            'interpolate',
-            ['linear'],
-            ['heatmap-density'],
-            0, 'rgba(33,102,172,0)',
-            0.2, 'rgb(103,169,207)',
-            0.4, 'rgb(209,229,240)',
-            0.6, 'rgb(253,219,199)',
-            0.8, 'rgb(239,138,98)',
-            1, 'rgb(178,24,43)'
-          ],
-          'heatmap-radius': 20,
-          'heatmap-opacity': 0.8
-        }
-      });
-
-      console.log("🔥 Heatmap aplicado exitosamente");
-    } catch (error) {
-      console.error("❌ Error aplicando heatmap:", error);
+    if (map.current.getSource(sourceId)) {
+      map.current.removeLayer(layerId);
+      map.current.removeSource(sourceId);
     }
+
+    map.current.addSource(sourceId, {
+      type: 'geojson',
+      data: geojsonData as any
+    });
+
+    map.current.addLayer({
+      id: layerId,
+      type: 'heatmap',
+      source: sourceId,
+      maxzoom: 15,
+      paint: {
+        'heatmap-weight': ['get', 'intensity'],
+        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0, 'rgba(33,102,172,0)',
+          0.2, 'rgb(103,169,207)',
+          0.4, 'rgb(209,229,240)',
+          0.6, 'rgb(253,219,199)',
+          0.8, 'rgb(239,138,98)',
+          1, 'rgb(178,24,43)'
+        ],
+        'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 15, 20],
+        'heatmap-opacity': 0.8
+      }
+    });
   }, [incidents]);
-
-  const removeHeatmapLayer = useCallback(() => {
-    if (!map.current) return;
-    
-    try {
-      if (map.current.getLayer('incidents-heatmap-layer')) {
-        map.current.removeLayer('incidents-heatmap-layer');
-      }
-      if (map.current.getSource('incidents-heatmap')) {
-        map.current.removeSource('incidents-heatmap');
-      }
-      console.log("🔥 Heatmap removido");
-    } catch (error) {
-      console.error("❌ Error removiendo heatmap:", error);
-    }
-  }, []);
 
   const handleSubmitIncident = async (data: CreateIncidentData) => {
     try {
-      console.log("🔄 Enviando incidente:", data);
+      console.log("🔄 CityMap: Enviando incidente:", data);
       await addIncident(data);
       setIsFormModalOpen(false);
       setSelectedCoordinates(null);
       setMostrarToast(true);
       setTimeout(() => setMostrarToast(false), 3000);
     } catch (error) {
-      console.error("❌ Error al enviar incidente:", error);
+      console.error("❌ CityMap: Error al enviar incidente:", error);
     }
   };
 
@@ -219,10 +207,11 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   useEffect(() => {
     if (mostrarHeatmap) {
       applyHeatmapLayer();
-    } else {
-      removeHeatmapLayer();
+    } else if (map.current?.getLayer('incidents-heatmap-layer')) {
+      map.current.removeLayer('incidents-heatmap-layer');
+      map.current.removeSource('incidents-heatmap');
     }
-  }, [mostrarHeatmap, applyHeatmapLayer, removeHeatmapLayer]);
+  }, [mostrarHeatmap, applyHeatmapLayer]);
 
   return (
     <motion.div 
@@ -230,15 +219,19 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
       animate={{ opacity: 1 }}
       className={`relative w-full h-full ${className || ''}`}
     >
+      {/* Header de la aplicación */}
       <AppHeader 
         mostrarHeatmap={mostrarHeatmap}
         onToggleHeatmap={() => setMostrarHeatmap(!mostrarHeatmap)}
       />
 
+      {/* Contenedor del mapa */}
       <div ref={mapContainer} className="w-full h-full" />
 
+      {/* Leyenda del mapa */}
       <MapLegend />
 
+      {/* Modal de formulario de incidencia */}
       {isFormModalOpen && selectedCoordinates && (
         <IncidentFormModal
           isOpen={isFormModalOpen}
@@ -251,6 +244,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
         />
       )}
 
+      {/* Panel de detalles de incidencia */}
       {isDetailsPanelOpen && selectedIncident && (
         <IncidentDetailsPanel
           incident={selectedIncident}
@@ -262,6 +256,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
         />
       )}
 
+      {/* Toast de confirmación */}
       <AnimatePresence>
         {mostrarToast && (
           <motion.div

@@ -121,11 +121,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <EmergencyPanel
         open={emergencyOpen}
         onClose={() => setEmergencyOpen(false)}
-        onSubmit={() => {
-          // En lugar de manejar localmente, podrías hacer una llamada a la API
-          // para crear una emergencia real y recibir notificaciones del servidor
-          alert('✅ ¡Gracias por reportar esta emergencia! Estamos tomando acciones.');
-        }}
       />
 
       <StatisticsPanel open={statsOpen} onClose={() => setStatsOpen(false)} />

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { StatisticsController } from "../controllers/statistics";
 import { NotificationController } from "../controllers/notifications";
 import IncidentController from "../controllers/incidents";
+import emergencyRoutes from "./emergencies";
 
 const router: Router = Router();
 
@@ -9,6 +10,9 @@ const router: Router = Router();
 router.get("/incidents", IncidentController.getAll);
 router.post("/incidents", IncidentController.create);
 router.post("/incidents/:id/vote", IncidentController.vote);
+
+// Rutas de emergencias
+router.use("/emergencies", emergencyRoutes);
 
 // Rutas de estadísticas
 router.get("/statistics", StatisticsController.getGeneral);

@@ -124,6 +124,40 @@ export class Database {
           }
         }
       );
+
+      // Tabla de emergencias
+      this.db!.run(
+        `
+        CREATE TABLE IF NOT EXISTS emergencies (
+          id TEXT PRIMARY KEY,
+          type TEXT NOT NULL,
+          title TEXT NOT NULL,
+          description TEXT,
+          province TEXT NOT NULL,
+          municipality TEXT,
+          latitude REAL,
+          longitude REAL,
+          status TEXT DEFAULT 'active',
+          priority TEXT DEFAULT 'medium',
+          reported_by TEXT,
+          reported_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+          resolved_at TEXT,
+          image_url TEXT,
+          affected_people INTEGER,
+          estimated_damage TEXT,
+          response TEXT,
+          is_public INTEGER DEFAULT 1
+        )
+      `,
+        (err) => {
+          if (err) {
+            console.error("Error creating emergencies table:", err);
+          } else {
+            console.log("Emergencies table created successfully");
+          }
+        }
+      );
     });
   }
 

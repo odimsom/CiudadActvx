@@ -1,10 +1,10 @@
 ---
 // Landing page para Ciudad Activa
-// Inspirada en el diseño y funcionalidad del módulo web
+// Plataforma digital ciudadana para reportar incidencias urbanas
 import Layout from '../layouts/Layout.astro';
 
-const title = "Ciudad Activa - Reporta y Mejora Tu Ciudad";
-const description = "Únete a miles de ciudadanos que están transformando su comunidad. Reporta incidencias, ve el progreso en tiempo real y ayuda a construir una ciudad mejor.";
+const title = "Ciudad Activa - Plataforma Digital Ciudadana";
+const description = "No basta con tecnología: una ciudad inteligente escucha y transforma. Reporta incidencias urbanas, visualiza problemas en tiempo real y ayuda a construir una ciudad mejor.";
 ---
 
 <Layout title={title} description={description}>
@@ -14,22 +14,20 @@ const description = "Únete a miles de ciudadanos que están transformando su co
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
-            <i data-lucide="map-pin" class="w-6 h-6 text-white"></i>
-          </div>
+          <img src="/src/assets/LogoCiudadActiva.jpg" alt="Ciudad Activa Logo" class="w-10 h-10 rounded-xl shadow-lg object-cover">
           <div>
             <h1 class="text-lg font-bold text-gray-900">Ciudad Activa</h1>
-            <p class="text-xs text-gray-500 hidden sm:block">Reporta y mejora tu ciudad</p>
+            <p class="text-xs text-gray-500 hidden sm:block">Plataforma Digital Ciudadana</p>
           </div>
         </div>
         
         <!-- Navegación Desktop -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="#como-funciona" class="text-gray-600 hover:text-blue-600 transition-colors">¿Cómo funciona?</a>
-          <a href="#caracteristicas" class="text-gray-600 hover:text-blue-600 transition-colors">Características</a>
-          <a href="#estadisticas" class="text-gray-600 hover:text-blue-600 transition-colors">Estadísticas</a>
-          <a href="#descargar" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-            ¡Úsala Ya!
+          <a href="#proyecto" class="text-gray-600 hover:text-blue-600 transition-colors">El Proyecto</a>
+          <a href="#equipo" class="text-gray-600 hover:text-blue-600 transition-colors">Equipo</a>
+          <a href="#demo" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+            Ver Demo
           </a>
         </div>
         
@@ -42,9 +40,9 @@ const description = "Únete a miles de ciudadanos que están transformando su co
       <!-- Menú móvil expandido -->
       <div id="mobile-menu" class="hidden md:hidden py-4 space-y-2">
         <a href="#como-funciona" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">¿Cómo funciona?</a>
-        <a href="#caracteristicas" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">Características</a>
-        <a href="#estadisticas" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">Estadísticas</a>
-        <a href="#descargar" class="block mx-4 mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl text-center">¡Úsala Ya!</a>
+        <a href="#proyecto" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">El Proyecto</a>
+        <a href="#equipo" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">Equipo</a>
+        <a href="#demo" class="block mx-4 mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl text-center">Ver Demo</a>
       </div>
     </nav>
   </header>
@@ -64,35 +62,33 @@ const description = "Únete a miles de ciudadanos que están transformando su co
         <div class="text-center lg:text-left">
           <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <i data-lucide="zap" class="w-4 h-4"></i>
-            Nueva versión disponible
+            Hackatón Ciudades Inteligentes 2025
           </div>
           
           <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Transforma tu
             <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Ciudad
+              Ciudad Activa
             </span>
-            reportando
           </h1>
           
-          <p class="text-xl text-gray-600 mb-8 max-w-lg">
-            Únete a miles de ciudadanos que están mejorando su comunidad. 
-            Reporta problemas, ve el progreso en tiempo real y construye una ciudad mejor juntos.
+          <p class="text-xl text-gray-600 mb-4 max-w-lg font-medium">
+            "No basta con tecnología: una ciudad inteligente escucha y transforma."
           </p>
           
-          <!-- Estadísticas rápidas -->
-          <div class="grid grid-cols-3 gap-4 mb-8">
-            <div class="text-center">
-              <div class="text-2xl font-bold text-blue-600" id="counter-reports">0</div>
-              <div class="text-sm text-gray-500">Reportes</div>
+          <p class="text-lg text-gray-500 mb-8 max-w-lg">
+            Plataforma digital ciudadana que permite reportar, visibilizar y dar seguimiento a las incidencias del entorno urbano, fortaleciendo la participación comunitaria y la transparencia institucional.
+          </p>
+          
+          <!-- Información del proyecto -->
+          <div class="bg-white rounded-xl p-6 mb-8 shadow-lg border border-gray-100">
+            <div class="text-sm text-gray-600 mb-2">
+              <strong>Fecha:</strong> 24 de julio 2025
             </div>
-            <div class="text-center">
-              <div class="text-2xl font-bold text-green-600" id="counter-resolved">0</div>
-              <div class="text-sm text-gray-500">Resueltos</div>
+            <div class="text-sm text-gray-600 mb-2">
+              <strong>Evento:</strong> Hackatón de Ciudades Inteligentes y Movilidad Urbana 2025
             </div>
-            <div class="text-center">
-              <div class="text-2xl font-bold text-purple-600" id="counter-users">0</div>
-              <div class="text-sm text-gray-500">Usuarios</div>
+            <div class="text-sm text-gray-600">
+              <strong>Equipo:</strong> Nodo Ciudadano
             </div>
           </div>
           
@@ -100,12 +96,12 @@ const description = "Únete a miles de ciudadanos que están transformando su co
           <div class="flex flex-col sm:flex-row gap-4">
             <a href="/webapp" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
               <i data-lucide="monitor" class="w-5 h-5"></i>
-              Abrir Web App
+              Ver Plataforma
               <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
             </a>
-            <a href="/demo" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2">
-              <i data-lucide="play" class="w-5 h-5"></i>
-              Ver demo
+            <a href="#proyecto" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2">
+              <i data-lucide="info" class="w-5 h-5"></i>
+              Conocer más
             </a>
           </div>
         </div>
@@ -116,9 +112,7 @@ const description = "Únete a miles de ciudadanos que están transformando su co
             <!-- Simulación de interfaz móvil -->
             <div class="bg-gray-100 rounded-2xl p-4 mb-4">
               <div class="flex items-center gap-3 mb-4">
-                <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                  <i data-lucide="map-pin" class="w-4 h-4 text-white"></i>
-                </div>
+                <img src="/src/assets/LogoCiudadActiva.jpg" alt="Ciudad Activa" class="w-8 h-8 rounded-lg object-cover">
                 <div>
                   <div class="font-semibold text-gray-900">Ciudad Activa</div>
                   <div class="text-xs text-gray-500">Reporta y mejora tu ciudad</div>
@@ -167,6 +161,92 @@ const description = "Únete a miles de ciudadanos que están transformando su co
           <div class="absolute -bottom-4 -left-4 bg-purple-500 text-white p-3 rounded-full animate-float">
             <i data-lucide="users" class="w-6 h-6"></i>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección del Proyecto -->
+  <section id="proyecto" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          Sobre el Proyecto
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Ciudad Activa es una plataforma digital ciudadana desarrollada para el Hackatón de Ciudades Inteligentes y Movilidad Urbana 2025.
+        </p>
+      </div>
+      
+      <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+        <!-- Objetivo -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg">
+          <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mb-6">
+            <i data-lucide="target" class="w-6 h-6 text-white"></i>
+          </div>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-4">Objetivo General</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Crear una plataforma digital ciudadana, accesible y colaborativa, que permita reportar, 
+            visibilizar y dar seguimiento a las incidencias del entorno urbano, fortaleciendo la 
+            participación comunitaria, la transparencia institucional y la capacidad de respuesta 
+            de las autoridades.
+          </p>
+        </div>
+        
+        <!-- Problemática -->
+        <div class="bg-white rounded-2xl p-8 shadow-lg">
+          <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center mb-6">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-white"></i>
+          </div>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-4">Problemática</h3>
+          <p class="text-gray-600 leading-relaxed">
+            En República Dominicana no existe un canal confiable, accesible y estructurado para 
+            reportar problemas urbanos. Las soluciones son tardías, parciales y desarticuladas. 
+            Esta desconexión desgasta la confianza ciudadana e inhibe la participación.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Marco Teórico -->
+      <div class="bg-gradient-to-br from-blue-600 to-purple-700 rounded-3xl p-8 lg:p-12 text-white mb-16">
+        <div class="max-w-4xl mx-auto text-center">
+          <h3 class="text-3xl font-bold mb-6">Marco Teórico</h3>
+          <p class="text-xl leading-relaxed mb-8 opacity-90">
+            "Una ciudad no se construye solo con concreto, acero y señalización. Se construye con la 
+            voluntad de quienes la habitan y con la capacidad de quienes la gobiernan para escuchar, 
+            actuar y responder."
+          </p>
+          <p class="text-lg leading-relaxed opacity-80">
+            Una ciudad verdaderamente inteligente es aquella que convierte el dato en decisión, 
+            la denuncia en intervención, y la participación ciudadana en motor de cambio.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Resultados Esperados -->
+      <div class="grid md:grid-cols-3 gap-8 mb-16">
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="users" class="w-8 h-8 text-white"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900 mb-2">Participación Ciudadana</h4>
+          <p class="text-gray-600 text-sm">Mayor involucramiento de los ciudadanos en la gestión urbana</p>
+        </div>
+        
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="database" class="w-8 h-8 text-white"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900 mb-2">Datos Sistematizados</h4>
+          <p class="text-gray-600 text-sm">Información organizada para la toma de decisiones públicas</p>
+        </div>
+        
+        <div class="text-center group">
+          <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="handshake" class="w-8 h-8 text-white"></i>
+          </div>
+          <h4 class="text-lg font-semibold text-gray-900 mb-2">Vínculos Fortalecidos</h4>
+          <p class="text-gray-600 text-sm">Mejor relación entre ciudadanía e instituciones públicas</p>
         </div>
       </div>
     </div>
@@ -534,6 +614,69 @@ const description = "Únete a miles de ciudadanos que están transformando su co
     </div>
   </section>
 
+  <!-- Equipo de Trabajo -->
+  <section id="equipo" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          Equipo de Trabajo
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Nodo Ciudadano - Equipo multidisciplinario comprometido con la transformación urbana
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <!-- Esthel Lahoz -->
+        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 text-center group hover:shadow-xl transition-all duration-300">
+          <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="brain" class="w-10 h-10 text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Esthel Mariela Lahoz Peña</h3>
+          <p class="text-blue-600 font-medium mb-3">Gestora Técnica y Desarrolladora de IA</p>
+          <p class="text-gray-600 text-sm">
+            Especialista en inteligencia artificial y gestión técnica de proyectos digitales innovadores.
+          </p>
+        </div>
+        
+        <!-- Alexander Matos -->
+        <div class="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 text-center group hover:shadow-xl transition-all duration-300">
+          <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="palette" class="w-10 h-10 text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Alexander Matos</h3>
+          <p class="text-green-600 font-medium mb-3">Diseñador UI/UX y Frontend</p>
+          <p class="text-gray-600 text-sm">
+            Diseñador de interfaces y desarrollador frontend especializado en experiencia de usuario.
+          </p>
+        </div>
+        
+        <!-- Francisco Castro -->
+        <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 text-center group hover:shadow-xl transition-all duration-300">
+          <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="server" class="w-10 h-10 text-white"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Francisco D. Castro</h3>
+          <p class="text-purple-600 font-medium mb-3">Desarrollador Backend y Arquitecto</p>
+          <p class="text-gray-600 text-sm">
+            Desarrollador backend y arquitecto de software en formación, especialista en sistemas robustos.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Filosofía del equipo -->
+      <div class="bg-gradient-to-br from-gray-900 to-blue-900 rounded-3xl p-8 lg:p-12 text-white text-center">
+        <h3 class="text-2xl font-bold mb-4">Nuestra Filosofía</h3>
+        <p class="text-xl mb-6 opacity-90">
+          "Combinar talento técnico con sensibilidad social para crear soluciones que respondan empáticamente a las necesidades reales de las comunidades dominicanas."
+        </p>
+        <p class="text-lg opacity-75">
+          Este equipo combina expertise técnico con compromiso social profundo hacia los desafíos urbanos del país.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="bg-gray-900 text-white py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -541,45 +684,44 @@ const description = "Únete a miles de ciudadanos que están transformando su co
         <!-- Logo y descripción -->
         <div class="md:col-span-2">
           <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
-              <i data-lucide="map-pin" class="w-6 h-6 text-white"></i>
-            </div>
+            <img src="/src/assets/LogoCiudadActiva.jpg" alt="Ciudad Activa Logo" class="w-10 h-10 rounded-xl object-cover">
             <div>
               <h3 class="text-lg font-bold">Ciudad Activa</h3>
-              <p class="text-sm text-gray-400">Reporta y mejora tu ciudad</p>
+              <p class="text-sm text-gray-400">Plataforma Digital Ciudadana</p>
             </div>
           </div>
           <p class="text-gray-300 max-w-md">
-            Plataforma ciudadana para reportar y dar seguimiento a problemas urbanos. 
-            Juntos construimos ciudades más vivibles y responsivas.
+            Plataforma digital ciudadana para reportar, visibilizar y dar seguimiento a incidencias urbanas. 
+            Fortaleciendo la participación comunitaria y la transparencia institucional.
           </p>
         </div>
         
         <!-- Enlaces -->
         <div>
-          <h4 class="font-semibold mb-4">Plataforma</h4>
+          <h4 class="font-semibold mb-4">Proyecto</h4>
           <ul class="space-y-2 text-gray-300">
             <li><a href="#como-funciona" class="hover:text-white transition-colors">¿Cómo funciona?</a></li>
-            <li><a href="#caracteristicas" class="hover:text-white transition-colors">Características</a></li>
-            <li><a href="#estadisticas" class="hover:text-white transition-colors">Estadísticas</a></li>
-            <li><a href="/app" class="hover:text-white transition-colors">Usar ahora</a></li>
+            <li><a href="#proyecto" class="hover:text-white transition-colors">Sobre el proyecto</a></li>
+            <li><a href="#equipo" class="hover:text-white transition-colors">Equipo</a></li>
+            <li><a href="#demo" class="hover:text-white transition-colors">Ver Demo</a></li>
           </ul>
         </div>
         
-        <!-- Contacto -->
+        <!-- Información del Proyecto -->
         <div>
-          <h4 class="font-semibold mb-4">Contacto</h4>
+          <h4 class="font-semibold mb-4">Hackatón 2025</h4>
           <ul class="space-y-2 text-gray-300">
-            <li>📧 contacto@ciudadactiva.do</li>
-            <li>📱 +1 809 123 4567</li>
-            <li>🏢 Santo Domingo, República Dominicana</li>
+            <li>🏆 Ciudades Inteligentes</li>
+            <li>� Movilidad Urbana</li>
+            <li>🇩� República Dominicana</li>
+            <li>📅 24 de julio 2025</li>
           </ul>
         </div>
       </div>
       
       <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; 2025 Ciudad Activa. Hecho con ❤️ para mejorar nuestras ciudades.</p>
-        <p class="text-xs mt-2">🚀 Versión actualizada: 24 julio 2025 - 12:45 PM</p>
+        <p>&copy; 2025 Ciudad Activa - Nodo Ciudadano. Desarrollado para el Hackatón de Ciudades Inteligentes y Movilidad Urbana 2025.</p>
+        <p class="text-xs mt-2">🚀 Equipo: Esthel Lahoz, Alexander Matos, Francisco Castro | 📅 24 de julio 2025</p>
       </div>
     </div>
   </footer>

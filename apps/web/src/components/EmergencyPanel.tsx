@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
+import { useEmergencies, EmergencyType, EmergencyPriority, CreateEmergencyData } from '../hooks/useEmergencies';
 
 interface EmergencyPanelProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: EmergencyReport) => void;
-}
-
-interface EmergencyReport {
-  type: 'flood' | 'earthquake';
-  province: string;
-  description?: string;
-  imageUrl?: string;
-  reportedAt: string;
 }
 
 const PROVINCIAS = [
@@ -20,24 +12,47 @@ const PROVINCIAS = [
   'San Juan', 'Monte Plata', 'Peravia', 'Barahona', 'Espaillat',
 ];
 
-export const EmergencyPanel: React.FC<EmergencyPanelProps> = ({ open, onClose, onSubmit }) => {
+export const EmergencyPanel: React.FC<EmergencyPanelProps> = ({ open, onClose }) => {
+  const { createEmergency } = useEmergencies();
   const [step, setStep] = useState(0);
-  const [type, setType] = useState<'flood' | 'earthquake' | null>(null);
+  const [type, setType] = useState<EmergencyType | null>(null);
   const [province, setProvince] = useState('');
   const [description, setDescription] = useState('');
-  const [image, setImage] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    const payload: EmergencyReport = {
-      type: type!,
+  const handleSubmit = async () => {
+    if (!type || !province) return;
+
+    setIsSubmitting(true);
+
+    const emergencyData: CreateEmergencyData = {
+      type,
       province,
-      description,
-      imageUrl: image ? URL.createObjectURL(image) : undefined,
-      reportedAt: new Date().toISOString(),
+      description: description || undefined,
+      priority: EmergencyPriority.HIGH, // Las emergencias reportadas por usuarios son de alta prioridad
+      reportedBy: "Usuario Ciudadano",
+      // TODO: Agregar coordenadas si están disponibles
+      // TODO: Subir imagen si está presente
     };
-    onSubmit(payload);
-    setStep(4); // Gracias
-    setTimeout(onClose, 3000); // Cierra luego de 3s
+
+    const success = await createEmergency(emergencyData);
+    
+    setIsSubmitting(false);
+
+    if (success) {
+      setStep(4); // Pantalla de éxito
+      setTimeout(() => {
+        onClose();
+        // Resetear formulario
+        setStep(0);
+        setType(null);
+        setProvince('');
+        setDescription('');
+      }, 3000);
+    } else {
+      // TODO: Mostrar mensaje de error
+      alert('Error al reportar la emergencia. Por favor intenta de nuevo.');
+    }
   };
 
   const renderStep = () => {
@@ -57,8 +72,8 @@ export const EmergencyPanel: React.FC<EmergencyPanelProps> = ({ open, onClose, o
           <div className="space-y-4">
             <h2 className="text-xl font-bold">¿Qué tipo de emergencia?</h2>
             <div className="grid grid-cols-2 gap-4">
-              <button onClick={() => { setType('flood'); setStep(2); }} className={`p-4 border rounded-lg ${type === 'flood' ? 'bg-blue-100' : ''}`}>🌊 Inundación</button>
-              <button onClick={() => { setType('earthquake'); setStep(2); }} className={`p-4 border rounded-lg ${type === 'earthquake' ? 'bg-blue-100' : ''}`}>🌎 Sismo</button>
+              <button onClick={() => { setType(EmergencyType.FLOOD); setStep(2); }} className={`p-4 border rounded-lg ${type === EmergencyType.FLOOD ? 'bg-blue-100' : ''}`}>🌊 Inundación</button>
+              <button onClick={() => { setType(EmergencyType.EARTHQUAKE); setStep(2); }} className={`p-4 border rounded-lg ${type === EmergencyType.EARTHQUAKE ? 'bg-blue-100' : ''}`}>🌎 Sismo</button>
             </div>
           </div>
         );
@@ -90,14 +105,15 @@ export const EmergencyPanel: React.FC<EmergencyPanelProps> = ({ open, onClose, o
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImage(e.target.files?.[0] ?? null)}
-            />
             <div className="flex justify-between">
               <button onClick={() => setStep(2)} className="text-sm text-blue-600">Atrás</button>
-              <button onClick={handleSubmit} className="btn bg-green-600 text-white">Reportar emergencia</button>
+              <button 
+                onClick={handleSubmit} 
+                disabled={isSubmitting}
+                className={`btn ${isSubmitting ? 'bg-gray-400' : 'bg-green-600'} text-white`}
+              >
+                {isSubmitting ? 'Reportando...' : 'Reportar emergencia'}
+              </button>
             </div>
           </div>
         );
