@@ -14,7 +14,9 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center gap-3">
-          <img src="/src/assets/LogoCiudadActiva.jpg" alt="Ciudad Activa Logo" class="w-10 h-10 rounded-xl shadow-lg object-cover">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <i data-lucide="map-pin" class="w-6 h-6 text-white"></i>
+          </div>
           <div>
             <h1 class="text-lg font-bold text-gray-900">Ciudad Activa</h1>
             <p class="text-xs text-gray-500 hidden sm:block">Plataforma Digital Ciudadana</p>
@@ -26,8 +28,8 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
           <a href="#como-funciona" class="text-gray-600 hover:text-blue-600 transition-colors">¿Cómo funciona?</a>
           <a href="#proyecto" class="text-gray-600 hover:text-blue-600 transition-colors">El Proyecto</a>
           <a href="#equipo" class="text-gray-600 hover:text-blue-600 transition-colors">Equipo</a>
-          <a href="#demo" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-            Ver Demo
+          <a href="https://ciudadactiva.vercel.app" target="_blank" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+            Usar App
           </a>
         </div>
         
@@ -42,7 +44,7 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
         <a href="#como-funciona" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">¿Cómo funciona?</a>
         <a href="#proyecto" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">El Proyecto</a>
         <a href="#equipo" class="block px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-lg">Equipo</a>
-        <a href="#demo" class="block mx-4 mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl text-center">Ver Demo</a>
+        <a href="https://ciudadactiva.vercel.app" target="_blank" class="block mx-4 mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl text-center">Usar App</a>
       </div>
     </nav>
   </header>
@@ -60,11 +62,6 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
       <div class="grid lg:grid-cols-2 gap-12 items-center">
         <!-- Contenido principal -->
         <div class="text-center lg:text-left">
-          <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-6">
-            <i data-lucide="zap" class="w-4 h-4"></i>
-            Hackatón Ciudades Inteligentes 2025
-          </div>
-          
           <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Ciudad Activa
@@ -76,27 +73,14 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
           </p>
           
           <p class="text-lg text-gray-500 mb-8 max-w-lg">
-            Plataforma digital ciudadana que permite reportar, visibilizar y dar seguimiento a las incidencias del entorno urbano, fortaleciendo la participación comunitaria y la transparencia institucional.
+            Plataforma digital que permite a los ciudadanos reportar incidencias urbanas, visualizar problemas en tiempo real y contribuir activamente a la mejora de su comunidad.
           </p>
-          
-          <!-- Información del proyecto -->
-          <div class="bg-white rounded-xl p-6 mb-8 shadow-lg border border-gray-100">
-            <div class="text-sm text-gray-600 mb-2">
-              <strong>Fecha:</strong> 24 de julio 2025
-            </div>
-            <div class="text-sm text-gray-600 mb-2">
-              <strong>Evento:</strong> Hackatón de Ciudades Inteligentes y Movilidad Urbana 2025
-            </div>
-            <div class="text-sm text-gray-600">
-              <strong>Equipo:</strong> Nodo Ciudadano
-            </div>
-          </div>
           
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-4">
-            <a href="/webapp" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
+            <a href="https://ciudadactiva.vercel.app" target="_blank" class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
               <i data-lucide="monitor" class="w-5 h-5"></i>
-              Ver Plataforma
+              Usar Ciudad Activa
               <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
             </a>
             <a href="#proyecto" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-blue-500 hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2">
@@ -580,7 +564,7 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
           <i data-lucide="external-link" class="w-4 h-4 group-hover:rotate-45 transition-transform"></i>
         </a>
         
-        <a href="/webapp" class="group border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center gap-3">
+        <a href="https://ciudadactiva.vercel.app" target="_blank" class="group border-2 border-white text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 flex items-center gap-3">
           <i data-lucide="monitor" class="w-6 h-6"></i>
           Web App
         </a>
@@ -703,7 +687,7 @@ const description = "No basta con tecnología: una ciudad inteligente escucha y 
             <li><a href="#como-funciona" class="hover:text-white transition-colors">¿Cómo funciona?</a></li>
             <li><a href="#proyecto" class="hover:text-white transition-colors">Sobre el proyecto</a></li>
             <li><a href="#equipo" class="hover:text-white transition-colors">Equipo</a></li>
-            <li><a href="#demo" class="hover:text-white transition-colors">Ver Demo</a></li>
+            <li><a href="https://ciudadactiva.vercel.app" target="_blank" class="hover:text-white transition-colors">Usar App</a></li>
           </ul>
         </div>
         
