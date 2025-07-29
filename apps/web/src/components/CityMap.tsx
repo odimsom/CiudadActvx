@@ -35,7 +35,6 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [clickRipples, setClickRipples] = useState<{ id: string; x: number; y: number; lng: number; lat: number }[]>([]);
-  // const [userLocation, setUserLocation] = useState<Coordinates | null>(null); // TODO: Implementar funcionalidad de ubicación
 
   const getMapStyle = () =>
     mostrarHeatmap
@@ -52,7 +51,6 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        // setUserLocation({ lat: latitude, lng: longitude }); // TODO: Implementar estado de ubicación
         
         // Centrar el mapa en la ubicación del usuario
         if (map.current) {
