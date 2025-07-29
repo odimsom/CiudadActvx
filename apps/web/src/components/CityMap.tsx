@@ -17,12 +17,16 @@ interface CityMapProps {
 }
 
 export const CityMap: React.FC<CityMapProps> = ({ className }) => {
+  console.log("🗺️ CityMap: Componente renderizado/montado");
+  
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<{ id: string; marker: mapboxgl.Marker }[]>([]);
 
   const { viewport, isLoaded, mapboxToken } = useMapbox();
   const { incidents, addIncident } = useIncidents();
+  
+  console.log("🗺️ CityMap: Incidents obtenidos del hook:", incidents);
 
   const [mostrarHeatmap, setMostrarHeatmap] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState<Coordinates | null>(null);
@@ -30,14 +34,71 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   const [selectedIncident, setSelectedIncident] = useState<IncidentReport | null>(null);
   const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-
-  const pressTimer = useRef<number | null>(null);
-  const initialPosition = useRef<{ x: number; y: number } | null>(null);
+  const [clickRipples, setClickRipples] = useState<{ id: string; x: number; y: number; lng: number; lat: number }[]>([]);
+  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
 
   const getMapStyle = () =>
     mostrarHeatmap
       ? 'mapbox://styles/mapbox/light-v11'
       : 'mapbox://styles/mapbox/streets-v12';
+
+  // Obtener ubicación actual del usuario
+  const getCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      console.warn('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        
+        // Centrar el mapa en la ubicación del usuario
+        if (map.current) {
+          map.current.flyTo({
+            center: [longitude, latitude],
+            zoom: 16,
+            duration: 1500
+          });
+        }
+      },
+      (error) => {
+        console.error('Error getting user location:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
+  }, []);
+
+  // Manejar click en el mapa
+  const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
+    const { lngLat, point } = e;
+    
+    // Crear efecto de onda
+    const rippleId = Date.now().toString();
+    const newRipple = {
+      id: rippleId,
+      x: point.x,
+      y: point.y,
+      lng: lngLat.lng,
+      lat: lngLat.lat
+    };
+    
+    setClickRipples(prev => [...prev, newRipple]);
+    
+    // Remover la onda después de la animación
+    setTimeout(() => {
+      setClickRipples(prev => prev.filter(ripple => ripple.id !== rippleId));
+    }, 1000);
+    
+    // Configurar coordenadas para el formulario
+    setSelectedCoordinates({ lat: lngLat.lat, lng: lngLat.lng });
+    setIsFormModalOpen(true);
+  }, []);
 
   useEffect(() => {
     if (!isLoaded || !mapContainer.current || map.current) return;
@@ -61,8 +122,16 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
       if (mostrarHeatmap) applyHeatmapLayer();
     });
 
-    return () => map.current?.remove();
-  }, [isLoaded, mapboxToken, viewport]);
+    // Agregar listener para clicks en el mapa
+    map.current.on('click', handleMapClick);
+
+    return () => {
+      if (map.current) {
+        map.current.off('click', handleMapClick);
+        map.current.remove();
+      }
+    };
+  }, [isLoaded, mapboxToken, viewport, handleMapClick, mostrarHeatmap]);
 
   const loadIncidentsOnMap = useCallback(() => {
     if (!map.current) return;
@@ -117,8 +186,12 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     };
 
     // Eliminar capas/sources previos
-    if (mapRef.getLayer('heatmap-incidencias')) mapRef.removeLayer('heatmap-incidencias');
-    if (mapRef.getSource('incidencias-heatmap')) mapRef.removeSource('incidencias-heatmap');
+    try {
+      if (mapRef.getLayer('heatmap-incidencias')) mapRef.removeLayer('heatmap-incidencias');
+      if (mapRef.getSource('incidencias-heatmap')) mapRef.removeSource('incidencias-heatmap');
+    } catch (error) {
+      console.warn('Error removing previous heatmap layers:', error);
+    }
 
     mapRef.addSource('incidencias-heatmap', {
       type: 'geojson',
@@ -174,36 +247,25 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   useEffect(() => {
     if (mostrarHeatmap) {
       applyHeatmapLayer();
-    } else if (map.current) {
-      if (map.current.getLayer('heatmap-incidencias')) map.current.removeLayer('heatmap-incidencias');
-      if (map.current.getSource('incidencias-heatmap')) map.current.removeSource('incidencias-heatmap');
+    } else if (map.current && map.current.isStyleLoaded()) {
+      try {
+        if (map.current.getLayer('heatmap-incidencias')) {
+          map.current.removeLayer('heatmap-incidencias');
+        }
+        if (map.current.getSource('incidencias-heatmap')) {
+          map.current.removeSource('incidencias-heatmap');
+        }
+      } catch (error) {
+        console.warn('Error removing heatmap layers:', error);
+      }
     }
   }, [mostrarHeatmap, applyHeatmapLayer]);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    const timeout = window.setTimeout(() => {
-      if (!map.current) return;
-      const lngLat = map.current.unproject([e.clientX, e.clientY]);
-      setSelectedCoordinates({ lat: lngLat.lat, lng: lngLat.lng });
-      setIsFormModalOpen(true);
-    }, 500);
-    pressTimer.current = timeout;
-    initialPosition.current = { x: e.clientX, y: e.clientY };
-  };
-
-  const handlePointerUp = () => {
-    if (pressTimer.current) clearTimeout(pressTimer.current);
-    pressTimer.current = null;
-    initialPosition.current = null;
-  };
+  // Removed old pointer handlers for new click-based interaction
 
   return (
     <motion.div
       className={`relative ${className}`}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
       style={{ touchAction: 'pan-x pan-y' }}
     >
       <AppHeader
@@ -242,6 +304,46 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
           setSelectedIncident(null);
         }}
       />
+
+      {/* Click Ripples */}
+      {clickRipples.map((ripple) => (
+        <motion.div
+          key={ripple.id}
+          className="absolute pointer-events-none z-40"
+          style={{
+            left: ripple.x - 20,
+            top: ripple.y - 20,
+            width: 40,
+            height: 40,
+          }}
+          initial={{ scale: 0, opacity: 1 }}
+          animate={{ scale: 3, opacity: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          onAnimationComplete={() => {
+            setClickRipples(prev => prev.filter(r => r.id !== ripple.id));
+          }}
+        >
+          <div className="w-full h-full rounded-full bg-blue-500/30 border-2 border-blue-500/50" />
+        </motion.div>
+      ))}
+
+      {/* User Location Button */}
+      <button
+        onClick={getCurrentLocation}
+        className="absolute top-20 right-4 z-50 bg-white shadow-lg rounded-lg p-3 hover:bg-gray-50 transition-colors"
+        title="Mi ubicación"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="h-5 w-5 text-gray-700" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
 
       {/* Notificaciones en tiempo real */}
       <RealtimeNotifications />

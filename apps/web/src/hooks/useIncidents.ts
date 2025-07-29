@@ -37,35 +37,72 @@ const convertApiIncidentToAppFormat = (
 });
 
 export function useIncidents() {
+  console.log("🎯 useIncidents: Hook inicializado");
+
   const [incidents, setIncidents] = useState<IncidentReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastFetch, setLastFetch] = useState<number>(0);
+
+  // Cache para evitar muchas peticiones
+  const CACHE_DURATION = 30000; // 30 segundos
+  const POLLING_INTERVAL = 60000; // 1 minuto para polling
 
   // Load incidents from API
-  const loadIncidents = async () => {
+  const loadIncidents = async (forceRefresh = false) => {
     try {
+      // Verificar cache si no es un refresh forzado
+      const now = Date.now();
+      if (!forceRefresh && lastFetch && now - lastFetch < CACHE_DURATION) {
+        console.log("� useIncidents: Usando datos del cache");
+        return;
+      }
+
+      console.log("�🔄 useIncidents: Iniciando carga de incidentes...");
       setLoading(true);
       setError(null);
       const apiIncidents = await ApiService.getIncidents();
+      console.log("📊 useIncidents: Incidentes recibidos:", apiIncidents);
       const convertedIncidents = apiIncidents.map(
         convertApiIncidentToAppFormat
       );
+      console.log(
+        "✅ useIncidents: Incidentes convertidos:",
+        convertedIncidents
+      );
       setIncidents(convertedIncidents);
+      setLastFetch(now);
     } catch (err) {
-      console.error("Error loading incidents:", err);
+      console.error("❌ useIncidents: Error loading incidents:", err);
       setError(err instanceof Error ? err.message : "Failed to load incidents");
     } finally {
       setLoading(false);
+      console.log("🔚 useIncidents: Carga completada");
     }
   };
 
-  // Initial load
+  // Initial load y polling automático
   useEffect(() => {
+    console.log(
+      "🔄 useIncidents: useEffect ejecutándose, iniciando carga inicial..."
+    );
     loadIncidents();
+
+    // Configurar polling cada minuto
+    const intervalId = setInterval(() => {
+      console.log("🔄 useIncidents: Polling automático ejecutándose...");
+      loadIncidents(false); // No forzar refresh, usa cache si es reciente
+    }, POLLING_INTERVAL);
+
+    return () => {
+      console.log("🔄 useIncidents: Limpiando interval de polling");
+      clearInterval(intervalId);
+    };
   }, []);
 
   const addIncident = async (data: CreateIncidentData): Promise<string> => {
     try {
+      console.log("🔄 useIncidents: Iniciando creación de incidente...", data);
       setError(null);
 
       // We need to get the type information from the typeId
@@ -130,14 +167,17 @@ export function useIncidents() {
         tags: [], // Default empty tags
       };
 
+      console.log("📤 useIncidents: Enviando datos a API:", apiData);
       const result = await ApiService.createIncident(apiData);
+      console.log("✅ useIncidents: Incidente creado exitosamente:", result);
 
       // Reload incidents to get the updated list
-      await loadIncidents();
+      console.log("🔄 useIncidents: Recargando lista de incidentes...");
+      await loadIncidents(true); // Forzar refresh para obtener el nuevo incidente
 
       return result.id;
     } catch (err) {
-      console.error("Error creating incident:", err);
+      console.error("❌ useIncidents: Error creating incident:", err);
       const errorMessage =
         err instanceof Error ? err.message : "Failed to create incident";
       setError(errorMessage);

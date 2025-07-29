@@ -1,7 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.PROD
-  ? "https://ciudadactvx-server.onrender.com/api"
-  : "http://localhost:3333/api";
+const API_BASE_URL = "https://ciudadactvx-server.onrender.com/api";
 
 export interface ApiIncident {
   id: string;
@@ -84,10 +82,21 @@ export class ApiService {
   // Incidents API
   static async getIncidents(): Promise<ApiIncident[]> {
     try {
+      console.log(
+        "🔄 Intentando obtener incidentes de:",
+        `${API_BASE_URL}/incidents`
+      );
       const response = await this.fetchWithTimeout(`${API_BASE_URL}/incidents`);
-      return await response.json();
+      const data = await response.json();
+      console.log("✅ Incidentes obtenidos exitosamente:", data);
+      return data;
     } catch (error) {
-      console.error("Error fetching incidents:", error);
+      console.error("❌ Error fetching incidents:", error);
+      console.error("🌐 API URL:", `${API_BASE_URL}/incidents`);
+      console.error("🔍 Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        name: error instanceof Error ? error.name : "UnknownError",
+      });
       throw new Error("Failed to fetch incidents");
     }
   }
@@ -109,6 +118,8 @@ export class ApiService {
     tags?: string[];
   }): Promise<{ id: string; message: string }> {
     try {
+      console.log("🔄 Intentando crear incidente:", data);
+      console.log("🌐 POST URL:", `${API_BASE_URL}/incidents`);
       const response = await this.fetchWithTimeout(
         `${API_BASE_URL}/incidents`,
         {
@@ -116,9 +127,15 @@ export class ApiService {
           body: JSON.stringify(data),
         }
       );
-      return await response.json();
+      const result = await response.json();
+      console.log("✅ Incidente creado exitosamente:", result);
+      return result;
     } catch (error) {
-      console.error("Error creating incident:", error);
+      console.error("❌ Error creating incident:", error);
+      console.error("🔍 Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        name: error instanceof Error ? error.name : "UnknownError",
+      });
       throw new Error("Failed to create incident");
     }
   }
