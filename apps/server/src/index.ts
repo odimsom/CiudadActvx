@@ -19,22 +19,45 @@ const app: Express = express();
 app.use(helmet());
 
 // Configurar CORS
+const allowedOrigins =
+  NODE_ENV === "production"
+    ? [
+        "https://ciudadactiva.vercel.app",
+        "https://ciudad-activa-landing.vercel.app",
+        /^https:\/\/ciudad-activa-.*\.vercel\.app$/,
+        "http://localhost:3000",
+        "http://localhost:4321",
+        "http://localhost:5173",
+      ]
+    : [
+        "http://localhost:3000",
+        "http://localhost:4321",
+        "http://localhost:5173",
+      ];
+
 app.use(
   cors({
-    origin:
-      NODE_ENV === "production"
-        ? [
-            "https://ciudadactiva.vercel.app",
-            "https://ciudad-activa-landing.vercel.app",
-            "http://localhost:3000",
-            "http://localhost:4321",
-            "http://localhost:5173",
-          ]
-        : [
-            "http://localhost:3000",
-            "http://localhost:4321",
-            "http://localhost:5173",
-          ],
+    origin: (origin, callback) => {
+      // Permitir requests sin origin (como aplicaciones móviles)
+      if (!origin) return callback(null, true);
+
+      const isAllowed = allowedOrigins.some((allowed) => {
+        if (typeof allowed === "string") {
+          return allowed === origin;
+        }
+        if (allowed instanceof RegExp) {
+          return allowed.test(origin);
+        }
+        return false;
+      });
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.log(`❌ CORS: Origin not allowed: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
