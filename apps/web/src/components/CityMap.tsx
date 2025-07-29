@@ -132,13 +132,26 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   }, [isLoaded, mapboxToken, viewport, handleMapClick, mostrarHeatmap]);
 
   const loadIncidentsOnMap = useCallback(() => {
-    if (!map.current) return;
+    if (!map.current) {
+      console.log("🗺️ loadIncidentsOnMap: Map no disponible");
+      return;
+    }
+    
+    console.log("🗺️ loadIncidentsOnMap: Cargando incidentes en mapa, total:", incidents.length);
     const mapRef = map.current;
 
+    // Limpiar marcadores existentes
     markersRef.current.forEach(({ marker }) => marker.remove());
     markersRef.current = [];
 
-    incidents.forEach((incident: IncidentReport) => {
+    incidents.forEach((incident: IncidentReport, index) => {
+      console.log(`🗺️ Creando marcador ${index + 1}:`, {
+        id: incident.id,
+        coordinates: incident.coordinates,
+        type: incident.type.name,
+        color: incident.type.color
+      });
+
       const el = document.createElement('div');
       el.className = 'incident-marker';
       el.style.cssText = `
@@ -164,6 +177,8 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
 
       markersRef.current.push({ id: incident.id, marker });
     });
+    
+    console.log("🗺️ loadIncidentsOnMap: Marcadores creados:", markersRef.current.length);
   }, [incidents]);
 
   // BLOQUE HEATMAP MODIFICADO:
@@ -258,6 +273,14 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
       }
     }
   }, [mostrarHeatmap, applyHeatmapLayer]);
+
+  // Cargar incidents en el mapa cuando cambien
+  useEffect(() => {
+    console.log("🗺️ useEffect incidents: Detectado cambio en incidents, total:", incidents.length);
+    if (map.current && map.current.isStyleLoaded()) {
+      loadIncidentsOnMap();
+    }
+  }, [incidents, loadIncidentsOnMap]);
 
   // Removed old pointer handlers for new click-based interaction
 

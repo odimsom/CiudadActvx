@@ -2,7 +2,7 @@ import React from 'react';
 
 export type Notification = {
   id: string;
-  type: 'emergency' | 'incident';
+  type: 'emergency' | 'incident' | 'info';
   title: string;
   message: string;
   createdAt: string;

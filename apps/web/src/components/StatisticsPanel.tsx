@@ -5,6 +5,7 @@ import {
   Tooltip, ResponsiveContainer
 } from 'recharts';
 import { useIncidents } from '../hooks/useIncidents';
+import { useStatistics } from '../hooks/useStatistics';
 import { IncidentReport } from '@ciudad-activa/types';
 
 // --- Categorías oficiales, nombre y color (usa exactamente las mismas claves que llegan desde el backend) ---
@@ -43,17 +44,18 @@ interface StatisticsPanelProps {
 
 export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ open, onClose }) => {
   const { incidents } = useIncidents();
+  const { statistics, loading: statsLoading } = useStatistics();
 
-  // -- Gráfico por estado: TODO pendiente (demo)
-  const statusCounts = [
-    {
-      name: STATUS[0].label,
-      value: incidents.length,
-      color: STATUS[0].color
-    }
+  // Estadísticas generales del servidor
+  const statusCounts = statistics ? [
+    { name: 'Pendientes', value: statistics.pendingIncidents, color: '#2563eb' },
+    { name: 'En proceso', value: statistics.inProgressIncidents, color: '#fbbf24' },
+    { name: 'Resueltas', value: statistics.resolvedIncidents, color: '#22c55e' },
+  ] : [
+    { name: 'Pendiente', value: incidents.length, color: STATUS[0].color }
   ];
 
-  // -- Por prioridad
+  // -- Por prioridad (usar datos locales si no hay del servidor)
   const priorityCounts = PRIORITIES.map(p => ({
     name: p.label,
     value: incidents.filter((i: IncidentReport) => i.priority === p.key).length,

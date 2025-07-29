@@ -39,12 +39,12 @@ export interface ApiStatistics {
 
 export interface ApiNotification {
   id: string;
-  incident_id?: string;
-  type: string;
+  type: "incident" | "emergency" | "info";
   title: string;
   message: string;
   created_at: string;
-  read_at?: string;
+  is_read: boolean;
+  incident_id?: string;
 }
 
 export class ApiService {

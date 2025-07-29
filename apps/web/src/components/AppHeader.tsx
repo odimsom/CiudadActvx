@@ -3,6 +3,7 @@ import { MapPin, Menu, Bell } from 'lucide-react';
 import { EmergencyPanel } from './EmergencyPanel';
 import { StatisticsPanel } from './StatisticsPanel';
 import { Notifications, Notification } from './Notifications';
+import { useNotifications } from '../hooks/useNotifications';
 
 interface AppHeaderProps {
   incidentCount?: number;
@@ -19,7 +20,24 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
   const [notificacionesAbiertas, setNotificacionesAbiertas] = useState(false);
-  const [notificaciones, setNotificaciones] = useState<Notification[]>([]);
+  
+  // Usar el hook real de notificaciones
+  const { 
+    notifications, 
+    loading: notificationsLoading, 
+    markAsRead, 
+    markAllAsRead, 
+    getUnreadCount 
+  } = useNotifications();
+
+  // Convertir notificaciones para el componente Notifications
+  const convertedNotifications: Notification[] = notifications.map(notif => ({
+    id: notif.id,
+    type: notif.type,
+    title: notif.title,
+    message: notif.message,
+    createdAt: notif.createdAt,
+  }));
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
@@ -41,9 +59,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               onClick={() => setNotificacionesAbiertas(!notificacionesAbiertas)}
             >
               <Bell className="w-5 h-5" />
-              {incidentCount > 0 && (
+              {getUnreadCount() > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {incidentCount > 99 ? '99+' : incidentCount}
+                  {getUnreadCount() > 99 ? '99+' : getUnreadCount()}
                 </span>
               )}
             </button>
@@ -104,16 +122,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         open={emergencyOpen}
         onClose={() => setEmergencyOpen(false)}
         onSubmit={(data) => {
-          setNotificaciones(prev => [
-            {
-              id: crypto.randomUUID(),
-              type: 'emergency',
-              title: '🚨 Emergencia reportada',
-              message: `${data.type === 'flood' ? 'Inundación' : 'Sismo'} en ${data.province}`,
-              createdAt: new Date().toISOString(),
-            },
-            ...prev
-          ]);
+          // En lugar de manejar localmente, podrías hacer una llamada a la API
+          // para crear una emergencia real y recibir notificaciones del servidor
           alert('✅ ¡Gracias por reportar esta emergencia! Estamos tomando acciones.');
         }}
       />
@@ -123,7 +133,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <Notifications
         open={notificacionesAbiertas}
         onClose={() => setNotificacionesAbiertas(false)}
-        notifications={notificaciones}
+        notifications={convertedNotifications}
       />
     </header>
   );
