@@ -3,10 +3,8 @@ import {
   IncidentReport,
   CreateIncidentData,
   IncidentStatus,
-  IncidentPriority,
-  IncidentCategory,
 } from "@ciudad-activa/types";
-import { ApiService, type ApiIncident } from "../services/apiService";
+import { ApiService } from "../services/apiService";
 
 // Helper function to convert API incident to app format
 const convertApiIncidentToAppFormat = (
