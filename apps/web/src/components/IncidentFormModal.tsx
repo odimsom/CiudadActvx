@@ -114,8 +114,17 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
     e.preventDefault();
     if (!selectedCategory || !title.trim()) return;
 
+    const categoryData = INCIDENT_CATEGORIES.find(cat => cat.id === selectedCategory);
+    if (!categoryData) return;
+
+    console.log('🎨 Datos de categoría encontrados:', categoryData);
+
     onSubmit({
       typeId: selectedCategory,
+      typeName: categoryData.name,
+      typeIcon: 'AlertTriangle', // Por simplicidad, usar un icono fijo
+      typeColor: categoryData.color,
+      typeCategory: selectedCategory,
       title: title.trim(),
       description: description.trim() || undefined,
       coordinates,

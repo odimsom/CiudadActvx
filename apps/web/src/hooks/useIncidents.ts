@@ -11,6 +11,7 @@ const convertApiIncidentToAppFormat = (
   apiIncident: any // Cambiamos a any temporalmente para debug
 ): IncidentReport => {
   console.log("🔄 Convirtiendo incidente:", apiIncident);
+  console.log("🎨 Color del tipo:", apiIncident.type?.color);
 
   return {
     id: apiIncident.id,

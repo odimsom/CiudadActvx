@@ -147,9 +147,11 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     incidents.forEach((incident: IncidentReport, index) => {
       console.log(`🗺️ Creando marcador ${index + 1}:`, {
         id: incident.id,
+        title: incident.title,
         coordinates: incident.coordinates,
-        type: incident.type.name,
-        color: incident.type.color
+        category: incident.type.category,
+        color: incident.type.color,
+        fullType: incident.type
       });
 
       const el = document.createElement('div');

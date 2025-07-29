@@ -61,6 +61,15 @@ export const IncidentMarker: React.FC<IncidentMarkerProps> = ({
   const categoryColor = CATEGORY_COLORS[incident.type.category as keyof typeof CATEGORY_COLORS];
   const statusColor = STATUS_COLORS[incident.status];
 
+  // Debug log para verificar colores
+  console.log("🔴 IncidentMarker - incident:", incident.id);
+  console.log("🔴 Category:", incident.type.category);
+  console.log("🔴 Color from type:", incident.type.color);
+  console.log("🔴 Category color from constants:", categoryColor);
+  console.log("🔴 Color final a usar:", incident.type.color || categoryColor || '#6b7280');
+
+  const finalColor = incident.type.color || categoryColor || '#6b7280';
+
   const sizeClasses = {
     small: 'w-8 h-8',
     medium: 'w-12 h-12',
@@ -86,7 +95,7 @@ export const IncidentMarker: React.FC<IncidentMarkerProps> = ({
         {/* Sombra base */}
         <div 
           className="absolute inset-0 rounded-full shadow-lg opacity-30"
-          style={{ backgroundColor: categoryColor }}
+          style={{ backgroundColor: finalColor }}
         />
         
         {/* Anillo de estado */}
@@ -108,8 +117,8 @@ export const IncidentMarker: React.FC<IncidentMarkerProps> = ({
         <div 
           className="absolute inset-1 rounded-full shadow-xl flex items-center justify-center text-white font-bold"
           style={{ 
-            backgroundColor: categoryColor,
-            boxShadow: `0 4px 15px ${categoryColor}40, 0 0 20px ${categoryColor}20`
+            backgroundColor: finalColor,
+            boxShadow: `0 4px 15px ${finalColor}40, 0 0 20px ${finalColor}20`
           }}
         >
           {IconComponent && <IconComponent className={`${iconSizes[size]} drop-shadow-sm`} />}

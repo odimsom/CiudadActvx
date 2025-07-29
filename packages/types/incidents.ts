@@ -1,5 +1,5 @@
 // Tipos para el sistema de incidencias
-import { Coordinates } from './maps';
+import { Coordinates } from "./maps";
 
 export interface IncidentType {
   id: string;
@@ -9,33 +9,33 @@ export interface IncidentType {
   category: IncidentCategory;
   description: string;
   emoji?: string;
-  severity?: 'low' | 'medium' | 'high';
+  severity?: "low" | "medium" | "high";
   estimatedResolveTime?: string;
   tags?: string[];
   isUrgent?: boolean;
 }
 
 export enum IncidentCategory {
-  WASTE = 'waste',
-  INFRASTRUCTURE = 'infrastructure',
-  SAFETY = 'safety',
-  ENVIRONMENT = 'environment',
-  TRANSPORTATION = 'transportation',
-  OTHER = 'other'
+  WASTE = "waste",
+  INFRASTRUCTURE = "infrastructure",
+  SAFETY = "safety",
+  ENVIRONMENT = "environment",
+  TRANSPORTATION = "transportation",
+  OTHER = "other",
 }
 
 export enum IncidentStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  RESOLVED = 'resolved',
-  REJECTED = 'rejected'
+  PENDING = "pending",
+  IN_PROGRESS = "in_progress",
+  RESOLVED = "resolved",
+  REJECTED = "rejected",
 }
 
 export enum IncidentPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  URGENT = 'urgent'
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  URGENT = "urgent",
 }
 
 export interface IncidentReport {
@@ -69,11 +69,18 @@ export interface IncidentReport {
 
 export interface CreateIncidentData {
   typeId: string;
+  typeName: string;
+  typeIcon: string;
+  typeColor: string;
+  typeCategory: string;
   title: string;
   description?: string;
-  coordinates: Coordinates;
+  latitude: number;
+  longitude: number;
+  address?: string;
   photos?: string[];
   priority?: IncidentPriority;
+  reportedBy?: string;
 }
 
 export interface IncidentImage {
