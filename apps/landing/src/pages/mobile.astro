@@ -45,8 +45,8 @@ import Layout from '../layouts/Layout.astro';
     <section class="py-16 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">Instalar PWA</h2>
-          <p class="text-lg text-gray-600">Escanea el código QR para instalar Ciudad Activa como aplicación nativa</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Acceso Móvil</h2>
+          <p class="text-lg text-gray-600">Escanea el código QR para abrir Ciudad Activa en tu móvil</p>
         </div>
 
         <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -63,7 +63,7 @@ import Layout from '../layouts/Layout.astro';
                 </div>
               </div>
             </div>
-            <p class="text-sm text-gray-500 mt-4">Apunta tu cámara al código QR para instalar la PWA</p>
+            <p class="text-sm text-gray-500 mt-4">Apunta tu cámara al código QR para abrir la app</p>
           </div>
 
           <!-- Download Instructions -->
@@ -196,12 +196,12 @@ import Layout from '../layouts/Layout.astro';
   document.addEventListener('DOMContentLoaded', function() {
     const qrContainer = document.getElementById('qr-code');
     
-    // QR code para instalar la PWA directamente
-    const pwaUrl = 'https://ciudadactiva.vercel.app/?install=true'; // URL con parámetro para PWA
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(pwaUrl)}`;
+    // QR code para la app móvil específica
+    const appUrl = 'https://ciudad-activa-mobile-3iyr1oqxr-odimsoms-projects.vercel.app';
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(appUrl)}`;
     
     qrContainer.innerHTML = `
-      <img src="${qrUrl}" alt="QR Code para instalar Ciudad Activa PWA" class="w-64 h-64 rounded-lg">
+      <img src="${qrUrl}" alt="QR Code para acceder a Ciudad Activa" class="w-64 h-64 rounded-lg">
     `;
   });
 </script>

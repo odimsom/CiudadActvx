@@ -1,12 +1,12 @@
 import React from 'react';
-import HomePage from '../../web/src/pages/HomePage';
+import { MobileCityMap } from './components/MobileCityMap';
 import InstallPWA from './components/InstallPWA';
 
 function App() {
   return (
-    <div className="App mobile-pwa">
+    <div className="App mobile-pwa h-screen w-full">
       <InstallPWA />
-      <HomePage />
+      <MobileCityMap className="h-full w-full" />
     </div>
   );
 }
