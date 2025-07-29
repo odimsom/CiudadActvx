@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { useIncidents } from '../hooks/useIncidents';
 import { IncidentReport } from '@ciudad-activa/types';
+import { AppHeader } from './AppHeader';
 
 interface CityMapDebugProps {
   className?: string;
@@ -76,8 +77,9 @@ export const CityMapDebug: React.FC<CityMapDebugProps> = ({ className }) => {
 
   return (
     <div className={`relative w-full h-screen ${className || ''}`}>
+      <AppHeader />
       <div ref={mapContainer} className="w-full h-full" />
-      <div className="absolute top-4 left-4 bg-white p-4 rounded shadow">
+      <div className="absolute top-20 left-4 bg-white p-4 rounded shadow">
         <h3 className="font-bold">Debug Info</h3>
         <p>Incidentes cargados: {incidents.length}</p>
         <p>Mapa: {map.current ? 'Cargado' : 'No cargado'}</p>

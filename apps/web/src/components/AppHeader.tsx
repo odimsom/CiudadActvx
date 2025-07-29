@@ -6,13 +6,13 @@ import { Notifications, Notification } from './Notifications';
 import { useNotifications } from '../hooks/useNotifications';
 
 interface AppHeaderProps {
-  mostrarHeatmap: boolean;
-  onToggleHeatmap: () => void;
+  mostrarHeatmap?: boolean;
+  onToggleHeatmap?: () => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
-  mostrarHeatmap,
-  onToggleHeatmap,
+  mostrarHeatmap = false,
+  onToggleHeatmap = () => {},
 }) => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [emergencyOpen, setEmergencyOpen] = useState(false);
@@ -24,6 +24,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     notifications, 
     getUnreadCount 
   } = useNotifications();
+
+  const unreadCount = getUnreadCount();
+  console.log("🔴 AppHeader - Total notificaciones:", notifications.length);
+  console.log("🔴 AppHeader - Notificaciones no leídas:", unreadCount);
+  console.log("🔴 AppHeader - Notificaciones detalle:", notifications);
 
   // Convertir notificaciones para el componente Notifications
   const convertedNotifications: Notification[] = notifications.map(notif => ({
@@ -54,9 +59,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
               onClick={() => setNotificacionesAbiertas(!notificacionesAbiertas)}
             >
               <Bell className="w-5 h-5" />
-              {getUnreadCount() > 0 && (
+              {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {getUnreadCount() > 99 ? '99+' : getUnreadCount()}
+                  {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
             </button>

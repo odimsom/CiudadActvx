@@ -38,12 +38,16 @@ export const useNotifications = () => {
       console.log("🔔 useNotifications: Cargando notificaciones...");
 
       const apiNotifications = await ApiService.getNotifications();
-      console.log("🔔 Notificaciones recibidas:", apiNotifications);
+      console.log("🔔 Notificaciones recibidas del API:", apiNotifications);
+      console.log("🔔 Cantidad de notificaciones:", apiNotifications.length);
 
       const convertedNotifications = apiNotifications.map(
         convertApiNotificationToAppFormat
       );
+      console.log("🔔 Notificaciones convertidas:", convertedNotifications);
+
       setNotifications(convertedNotifications);
+      console.log("🔔 Estado de notificaciones actualizado");
     } catch (err) {
       console.error("❌ useNotifications: Error loading notifications:", err);
       setError(

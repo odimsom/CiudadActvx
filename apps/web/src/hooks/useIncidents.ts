@@ -157,15 +157,15 @@ export function useIncidents() {
         title: data.title,
         description: data.description,
         typeId: data.typeId,
-        typeName: typeInfo.name,
-        typeIcon: typeInfo.icon,
-        typeColor: typeInfo.color,
-        typeCategory: typeInfo.category,
-        latitude: data.coordinates.lat,
-        longitude: data.coordinates.lng,
-        address: "", // Will be filled by geocoding if available
+        typeName: data.typeName || typeInfo.name,
+        typeIcon: data.typeIcon || typeInfo.icon,
+        typeColor: data.typeColor || typeInfo.color,
+        typeCategory: data.typeCategory || typeInfo.category,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        address: data.address || "", // Will be filled by geocoding if available
         priority: data.priority || "medium",
-        reportedBy: "Usuario Web", // Default user
+        reportedBy: data.reportedBy || "Usuario Web", // Default user
         photos: data.photos || [],
         tags: [], // Default empty tags
       };

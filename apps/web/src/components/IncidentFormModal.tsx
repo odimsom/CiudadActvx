@@ -127,7 +127,8 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
       typeCategory: selectedCategory,
       title: title.trim(),
       description: description.trim() || undefined,
-      coordinates,
+      latitude: coordinates.lat,
+      longitude: coordinates.lng,
       priority: IncidentPriority.MEDIUM,
     });
 
