@@ -1,6 +1,7 @@
 import React from 'react';
 import { MobileCityMap } from './components/MobileCityMap';
 import InstallPWA from './components/InstallPWA';
+import './styles/animations.css';
 
 function App() {
   return (

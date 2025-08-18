@@ -11,15 +11,16 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@ciudad-activa/incidents": "workspace:*",
     "@ciudad-activa/maps": "workspace:*",
     "@ciudad-activa/types": "workspace:*",
     "@ciudad-activa/utils": "workspace:*",
-    "@ciudad-activa/incidents": "workspace:*",
+    "clsx": "^2.0.0",
+    "framer-motion": "^12.18.1",
+    "lucide-react": "^0.263.1",
+    "mapbox-gl": "^3.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "mapbox-gl": "^3.0.1",
-    "lucide-react": "^0.263.1",
-    "clsx": "^2.0.0",
     "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {

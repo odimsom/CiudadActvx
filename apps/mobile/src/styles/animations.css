@@ -1,0 +1,230 @@
+/* Animaciones CSS personalizadas para la app móvil */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-gentle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-bounceIn {
+  animation: bounceIn 0.5s ease-out forwards;
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+/* Mejoras de interfaz móvil */
+.touch-friendly {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.backdrop-blur-strong {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Transiciones suaves */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estados de hover mejorados para móvil */
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Estados activos para dispositivos táctiles */
+.active-press:active {
+  transform: scale(0.98);
+}
+
+/* Mejoras de accesibilidad */
+.focus-ring:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Animaciones específicas para reportes */
+.report-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  animation: bounceIn 0.6s ease-out;
+}
+
+.report-progress {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Efectos visuales para botones importantes */
+.button-primary {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.button-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.button-primary:active {
+  transform: translateY(0);
+}
+
+/* Estilos para iconos animados */
+.icon-bounce {
+  animation: bounceIn 0.6s ease-out;
+}
+
+.icon-float {
+  animation: pulse-gentle 3s ease-in-out infinite;
+}
+
+/* Grid responsivo mejorado */
+.responsive-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+/* Efectos para fotos y galería */
+.photo-preview {
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.photo-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s ease;
+}
+
+.photo-preview:hover::after {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Mejoras para formularios móviles */
+.form-input-mobile {
+  font-size: 16px; /* Previene zoom en iOS */
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.form-input-mobile:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Indicadores de progreso */
+.progress-bar {
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  height: 4px;
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Toast notifications mejoradas */
+.toast-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  animation: slideUp 0.4s ease-out;
+}
+
+/* Efectos para tutoriales */
+.tutorial-highlight {
+  position: relative;
+  z-index: 1000;
+}
+
+.tutorial-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  border-radius: 16px;
+  z-index: -1;
+  animation: pulse-gentle 2s ease-in-out infinite;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dark-mode-bg {
+    background-color: #1f2937;
+    color: #f9fafb;
+  }
+  
+  .dark-mode-border {
+    border-color: #374151;
+  }
+}
+
+/* Reduce motion para usuarios con sensibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
