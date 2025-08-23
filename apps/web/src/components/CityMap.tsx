@@ -53,37 +53,65 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
 
   useEffect(() => {
     if (!isLoaded || !mapContainer.current || map.current) return;
+    
+    // Verificar que el contenedor del mapa esté disponible
+    if (!mapContainer.current || !mapContainer.current.isConnected) {
+      console.warn("🗺️ Contenedor del mapa no está disponible");
+      return;
+    }
 
     mapboxgl.accessToken = mapboxToken;
 
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [viewport.center.lng, viewport.center.lat],
-      zoom: viewport.zoom
-    });
+    try {
+      console.log("🗺️ Inicializando mapa...");
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [viewport.center.lng, viewport.center.lat],
+        zoom: viewport.zoom
+      });
 
-    map.current.on('load', () => {
-      console.log("🗺️ Mapa cargado completamente");
-      loadIncidentsOnMap();
-    });
+      map.current.on('load', () => {
+        console.log("🗺️ Mapa cargado completamente");
+        // Esperamos un poco para asegurar que todo esté listo
+        setTimeout(() => {
+          loadIncidentsOnMap();
+        }, 100);
+      });
 
-    map.current.on('click', handleMapClick);
+      map.current.on('click', handleMapClick);
+
+      console.log("🗺️ Mapa inicializado exitosamente");
+    } catch (error) {
+      console.error("🗺️ Error al inicializar mapa:", error);
+      return;
+    }
 
     return () => {
       if (map.current) {
         map.current.off('click', handleMapClick);
         map.current.remove();
+        map.current = null;
       }
     };
   }, [isLoaded, mapboxToken, viewport, handleMapClick]);
 
   const loadIncidentsOnMap = useCallback(() => {
-    if (!map.current) return;
+    if (!map.current || !map.current.isStyleLoaded()) {
+      console.warn("🗺️ Mapa no está listo para cargar marcadores");
+      return;
+    }
     
     console.log("🗺️ Cargando incidentes en mapa, total:", incidents.length);
 
-    markersRef.current.forEach(({ marker }) => marker.remove());
+    // Limpiar marcadores existentes
+    markersRef.current.forEach(({ marker }) => {
+      try {
+        marker.remove();
+      } catch (error) {
+        console.warn("🗺️ Error al remover marcador:", error);
+      }
+    });
     markersRef.current = [];
 
     incidents.forEach((incident: IncidentReport, index) => {
@@ -118,10 +146,20 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
       });
 
       const marker = new mapboxgl.Marker(el)
-        .setLngLat([incident.coordinates.lng, incident.coordinates.lat])
-        .addTo(map.current!);
+        .setLngLat([incident.coordinates.lng, incident.coordinates.lat]);
 
-      markersRef.current.push({ marker, id: incident.id });
+      // Verificar que el mapa esté completamente disponible antes de añadir el marcador
+      if (map.current && map.current.getContainer() && map.current.isStyleLoaded()) {
+        try {
+          marker.addTo(map.current);
+          markersRef.current.push({ marker, id: incident.id });
+          console.log(`✅ Marcador ${index + 1} añadido exitosamente`);
+        } catch (error) {
+          console.error("🗺️ Error al añadir marcador:", error);
+        }
+      } else {
+        console.warn(`⚠️ No se pudo añadir marcador ${index + 1}: mapa no disponible`);
+      }
     });
 
     console.log("🗺️ Marcadores creados:", markersRef.current.length);
@@ -130,8 +168,8 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   const applyHeatmapLayer = useCallback(() => {
     console.log("🔥 Aplicando heatmap...");
     
-    if (!map.current || !incidents.length) {
-      console.log("🔥 No se puede aplicar heatmap");
+    if (!map.current || !map.current.isStyleLoaded() || !incidents.length) {
+      console.log("🔥 No se puede aplicar heatmap - mapa no listo o sin incidentes");
       return;
     }
 
@@ -153,7 +191,7 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
     const layerId = 'incidents-heatmap-layer';
 
     try {
-      // Remover existentes
+      // Remover existentes de forma segura
       if (map.current.getLayer && map.current.getLayer(layerId)) {
         map.current.removeLayer(layerId);
       }
@@ -197,16 +235,25 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   }, [incidents]);
 
   const removeHeatmapLayer = useCallback(() => {
-    if (!map.current) return;
+    if (!map.current || !map.current.isStyleLoaded()) {
+      console.warn("🗺️ Mapa no está listo para remover heatmap");
+      return;
+    }
     
     try {
-      if (map.current.getLayer('incidents-heatmap-layer')) {
+      // Verificar si la capa existe antes de intentar removerla
+      if (map.current.getLayer && map.current.getLayer('incidents-heatmap-layer')) {
         map.current.removeLayer('incidents-heatmap-layer');
+        console.log("🔥 Capa heatmap removida");
       }
-      if (map.current.getSource('incidents-heatmap')) {
+      
+      // Verificar si la fuente existe antes de intentar removerla
+      if (map.current.getSource && map.current.getSource('incidents-heatmap')) {
         map.current.removeSource('incidents-heatmap');
+        console.log("🔥 Fuente heatmap removida");
       }
-      console.log("🔥 Heatmap removido");
+      
+      console.log("🔥 Heatmap removido completamente");
     } catch (error) {
       console.error("❌ Error removiendo heatmap:", error);
     }
@@ -281,7 +328,10 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   }, [isLoaded]);
 
   useEffect(() => {
-    loadIncidentsOnMap();
+    // Solo cargar incidentes si el mapa está completamente inicializado
+    if (map.current && map.current.isStyleLoaded()) {
+      loadIncidentsOnMap();
+    }
   }, [incidents, loadIncidentsOnMap]);
 
   useEffect(() => {
