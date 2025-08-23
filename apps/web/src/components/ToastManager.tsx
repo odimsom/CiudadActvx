@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, AlertCircle, XCircle, Info, X } from 'lucide-react';
 
@@ -66,11 +66,11 @@ const toastConfig = {
   }
 };
 
-const ToastItem: React.FC<{ 
-  toast: ToastNotification; 
+const ToastItem = forwardRef<HTMLDivElement, { 
+  toast: ToastNotification;
   onRemove: (id: string) => void;
   index: number;
-}> = ({ toast, onRemove, index }) => {
+}>(({ toast, onRemove, index }, ref) => {
   const [isExiting, setIsExiting] = useState(false);
   const [progress, setProgress] = useState(100);
   const config = toastConfig[toast.type];
@@ -109,6 +109,7 @@ const ToastItem: React.FC<{
 
   return (
     <motion.div
+      ref={ref as any}
       initial={{ opacity: 0, x: 300, scale: 0.9 }}
       animate={{ 
         opacity: 1, 
@@ -207,7 +208,8 @@ const ToastItem: React.FC<{
       )}
     </motion.div>
   );
-};
+});
+ToastItem.displayName = 'ToastItem';
 
 export const ToastManager: React.FC<ToastManagerProps> = ({ toasts, onRemoveToast }) => {
   return (

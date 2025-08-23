@@ -8,8 +8,7 @@ import { Button } from '@ciudad-activa/maps/components/ui/button';
 import {
   MapPin,
   Send,
-  X,
-  Camera
+  X
 } from 'lucide-react';
 // Importar iconos más atractivos de react-icons
 import {
@@ -20,10 +19,10 @@ import {
   FaCar,
   FaLightbulb,
   FaWater,
-  FaVolumeMute,
-  FaImage
+  FaVolumeMute
 } from 'react-icons/fa';
 import { CreateIncidentData, IncidentPriority, Coordinates } from '@ciudad-activa/types';
+import { LocalImageUploader } from './LocalImageUploader';
 
 // Categorías mejoradas con iconos más atractivos
 const INCIDENT_CATEGORIES = [
@@ -109,7 +108,7 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [images, setImages] = useState<File[]>([]);
+  const [imageKeys, setImageKeys] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,6 +130,7 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
       latitude: coordinates.lat,
       longitude: coordinates.lng,
       priority: IncidentPriority.MEDIUM,
+      photos: imageKeys, // Enviar las claves de las imágenes almacenadas localmente
     });
 
     // Reset form
@@ -141,30 +141,8 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
     setSelectedCategory('');
     setTitle('');
     setDescription('');
-    setImages([]);
+    setImageKeys([]);
     onClose();
-  };
-
-  // Adaptador para uso en elementos DOM creados dinámicamente
-  const handleFileInputChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target?.files) {
-      const mockChangeEvent = {
-        target: {
-          files: target.files
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      handleImageUpload(mockChangeEvent);
-    }
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setImages(prev => [...prev, ...files].slice(0, 3)); // Máximo 3 imágenes
-  };
-
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -317,7 +295,7 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
               </div>
             </motion.div>
 
-            {/* Subir imágenes */}
+            {/* Subir imágenes con almacenamiento local */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -328,108 +306,10 @@ export const IncidentFormModal: React.FC<IncidentFormModalProps> = ({
                 <span className="text-gray-400 font-normal ml-1">(opcional, máximo 3)</span>
               </label>
               
-              {/* Área de subida mejorada */}
-              <div className="space-y-4">
-                {/* Botones de acción para web y móvil */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.capture = 'environment';
-                      input.onchange = handleFileInputChange;
-                      input.click();
-                    }}
-                    className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-blue-300 rounded-2xl hover:bg-blue-50 hover:border-blue-400 transition-all duration-200 group md:hidden"
-                  >
-                    <div className="p-2 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
-                      <Camera className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <span className="text-sm font-medium text-blue-700 text-center">
-                      📷 Usar Cámara
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.multiple = true;
-                      input.onchange = handleFileInputChange;
-                      input.click();
-                    }}
-                    className="flex flex-col items-center gap-2 p-4 border-2 border-dashed border-purple-300 rounded-2xl hover:bg-purple-50 hover:border-purple-400 transition-all duration-200 group"
-                  >
-                    <div className="p-2 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
-                      <FaImage className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <span className="text-sm font-medium text-purple-700 text-center">
-                      🖼️ Elegir Archivos
-                    </span>
-                  </button>
-                </div>
-
-                {/* Área de drag and drop */}
-                <div 
-                  className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center hover:border-gray-400 transition-colors cursor-pointer"
-                  onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.multiple = true;
-                    input.onchange = handleFileInputChange;
-                    input.click();
-                  }}
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    e.currentTarget.classList.add('border-blue-400', 'bg-blue-50');
-                  }}
-                  onDragLeave={(e) => {
-                    e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50');
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.currentTarget.classList.remove('border-blue-400', 'bg-blue-50');
-                    const files = Array.from(e.dataTransfer.files) as File[];
-                    const imageFiles = files.filter(file => file.type.startsWith('image/'));
-                    setImages(prev => [...prev, ...imageFiles].slice(0, 3));
-                  }}
-                >
-                  <FaImage className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Haz clic aquí</span> o arrastra las fotos
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {images.length >= 3 ? 'Máximo 3 fotos' : 'Las fotos ayudan a resolver el problema más rápido'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Preview de imágenes */}
-              {images.length > 0 && (
-                <div className="flex gap-3 mt-4 flex-wrap">
-                  {images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt={`Preview ${index + 1}`}
-                        className="w-16 h-16 object-cover rounded-xl border-2 border-gray-200 shadow-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 shadow-lg"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <LocalImageUploader 
+                onImagesChange={setImageKeys}
+                maxImages={3}
+              />
             </motion.div>
 
             {/* Botón de envío */}

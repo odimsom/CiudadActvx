@@ -107,7 +107,6 @@ export interface ApiNotification {
 export class ApiService {
   private static retryCount = new Map<string, number>();
   private static lastRequestTime = new Map<string, number>();
-  private static cooldownUntil = new Map<string, number>(); // per-operation cooldown timestamp
 
   // Enhanced timeout with better error handling
   private static async fetchWithTimeout(
@@ -154,15 +153,6 @@ export class ApiService {
     operationName: string,
     maxRetries = 3
   ): Promise<T> {
-    // If we're under a cooldown for this operation, skip making any network request
-    const cooldown = this.cooldownUntil.get(operationName) || 0;
-    if (Date.now() < cooldown) {
-      const msLeft = cooldown - Date.now();
-      throw new Error(
-        `Rate limit active for ${operationName}. Try again in ${Math.ceil(msLeft / 1000)}s`
-      );
-    }
-
     const currentRetries = this.retryCount.get(operationName) || 0;
 
     // Rate limiting: Wait between requests
@@ -191,21 +181,16 @@ export class ApiService {
         error.message.includes("Rate limit") ||
         error.message.includes("Too Many Requests")
       ) {
-        // Server indicates rate limit; set a conservative cooldown to avoid hammering
-        // Try to parse minutes from server message, else default to 15 minutes
-        let minutes = 15;
-        const match = error.message.match(/(\d+)\s*(minuto|minutos)/i);
-        if (match && match[1]) {
-          const parsed = parseInt(match[1], 10);
-          if (!isNaN(parsed) && parsed > 0) minutes = parsed;
-        }
-        const until = Date.now() + minutes * 60_000;
-        this.cooldownUntil.set(operationName, until);
+        // Exponential backoff for rate limiting
+        const backoffTime = Math.min(3000 * Math.pow(2, currentRetries), 20000);
         console.warn(
-          `⛔ Rate limit for ${operationName}. Cooling down for ${minutes} min (until ${new Date(until).toLocaleTimeString()})`
+          `⏳ Rate limited for ${operationName}, waiting ${backoffTime}ms before retry ${currentRetries + 1}/${maxRetries}`
         );
-        // Stop retrying immediately since the server asked to wait minutes
-        throw error;
+
+        this.retryCount.set(operationName, currentRetries + 1);
+        await new Promise((resolve) => setTimeout(resolve, backoffTime));
+
+        return this.retryWithBackoff(operation, operationName, maxRetries);
       }
 
       throw error;

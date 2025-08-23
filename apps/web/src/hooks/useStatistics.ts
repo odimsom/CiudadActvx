@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ApiService, type ApiStatistics } from "../services/apiService";
 
 export interface StatisticsData {
@@ -26,6 +26,7 @@ export const useStatistics = () => {
   const [statistics, setStatistics] = useState<StatisticsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isInitialized = useRef(false);
 
   const loadStatistics = async () => {
     try {
@@ -50,12 +51,32 @@ export const useStatistics = () => {
   };
 
   useEffect(() => {
-    loadStatistics();
+    // Evitar dobles ejecuciones en StrictMode
+    if (isInitialized.current) {
+      return;
+    }
+    isInitialized.current = true;
 
-    // Recargar estadísticas cada 5 minutos
-    const intervalId = setInterval(loadStatistics, 300000);
+    // Esperar a que incidentes haga su primera carga para priorizar ese endpoint
+    const start = Date.now();
+    const maxWaitMs = 10000; // 10s máximo
+    const tryStart = () => {
+      const done = (window as any).__incidentsFirstLoadDone;
+      if (done || Date.now() - start > maxWaitMs) {
+        loadStatistics();
+      } else {
+        setTimeout(tryStart, 300);
+      }
+    };
+    tryStart();
 
-    return () => clearInterval(intervalId);
+    // Recargar estadísticas cada 10 minutos (reducido para evitar rate limiting)
+    const intervalId = setInterval(loadStatistics, 600000);
+
+    return () => {
+      clearInterval(intervalId);
+      isInitialized.current = false;
+    };
   }, []);
 
   return {

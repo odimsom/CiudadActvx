@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, Bell, Download } from 'lucide-react';
 import { EmergencyPanel } from './EmergencyPanel';
 import { StatisticsPanel } from './StatisticsPanel';
+import { InstitutionDashboardModal } from './InstitutionDashboardModal';
 import { Notifications, Notification } from './Notifications';
 import { useNotifications } from '../hooks/useNotifications';
 
@@ -17,6 +18,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [statsOpen, setStatsOpen] = useState(false);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
   const [notificacionesAbiertas, setNotificacionesAbiertas] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [canInstall, setCanInstall] = useState(false);
@@ -151,6 +153,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
             <button
               onClick={() => {
+                setDashboardOpen(true);
+                setMenuAbierto(false);
+              }}
+              className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 text-gray-700"
+            >
+              Dashboard institucional
+            </button>
+
+            <button
+              onClick={() => {
                 setStatsOpen(true);
                 setMenuAbierto(false);
               }}
@@ -178,6 +190,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       />
 
       <StatisticsPanel open={statsOpen} onClose={() => setStatsOpen(false)} />
+
+  <InstitutionDashboardModal open={dashboardOpen} onClose={() => setDashboardOpen(false)} />
 
       <Notifications
         open={notificacionesAbiertas}

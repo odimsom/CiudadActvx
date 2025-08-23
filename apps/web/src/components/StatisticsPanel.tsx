@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {
   PieChart, Pie, Cell,
   BarChart, Bar, XAxis, YAxis,
@@ -72,11 +73,11 @@ export const StatisticsPanel: React.FC<StatisticsPanelProps> = ({ open, onClose 
   // Panel oculto si no está abierto
   if (!open) return null;
 
-return (
+  const node = (
   <>
     {/* Overlay */}
     <div
-      className="fixed inset-0 bg-black/30 z-40"
+      className="fixed inset-0 bg-black/35 z-[1000]"
       onClick={onClose}
       aria-hidden
     />
@@ -84,7 +85,7 @@ return (
       className="
         fixed top-0 right-0 h-screen
         w-[85%] md:w-full md:max-w-md
-        bg-white shadow-xl z-50 border-l border-gray-200
+        bg-white shadow-xl z-[1100] border-l border-gray-200
         overflow-y-auto flex flex-col
       "
       aria-modal="true"
@@ -205,5 +206,10 @@ return (
     </aside>
   </>
 );
+
+  if (typeof document !== 'undefined') {
+    return ReactDOM.createPortal(node, document.body);
+  }
+  return node as any;
 
 };

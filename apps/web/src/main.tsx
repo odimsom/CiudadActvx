@@ -9,8 +9,8 @@ import { configureMapbox } from '@ciudad-activa/maps/utils/mapbox-config'
 // Configure Mapbox to disable telemetry
 configureMapbox();
 
-// Registrar Service Worker para PWA
-if ('serviceWorker' in navigator) {
+// Registrar Service Worker para PWA solo en producción
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {

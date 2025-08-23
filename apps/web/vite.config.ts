@@ -16,6 +16,10 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true
+    host: true,
+    strictPort: true,
+    hmr: {
+      overlay: true,
+    }
   }
 })

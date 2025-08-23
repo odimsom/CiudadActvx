@@ -11,6 +11,7 @@ import {
 } from 'react-icons/fa';
 import { IncidentReport } from '@ciudad-activa/types';
 import { Button } from '@ciudad-activa/maps/components/ui/button';
+import { useLocalImageStorage } from '../hooks/useLocalImageStorage';
 
 const CATEGORY_ICONS = {
   waste: FaTrash,
@@ -48,6 +49,14 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
   isOpen,
   onClose
 }) => {
+  const { getImage } = useLocalImageStorage();
+  
+  // Función para obtener imágenes del localStorage usando las keys almacenadas
+  const getImagesFromStorage = (photos: string[] | undefined) => {
+    if (!photos || photos.length === 0) return [];
+    
+    return photos.map(photoKey => getImage(photoKey)).filter(Boolean) as string[];
+  };
   if (!incident) return null;
 
   const IconComponent = CATEGORY_ICONS[incident.type.category as keyof typeof CATEGORY_ICONS];
@@ -101,7 +110,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-4 left-0 right-0 max-h-[90vh] w-full max-w-md bg-white shadow-2xl z-50 rounded-t-2xl mx-auto flex flex-col overflow-hidden"
+            className="fixed bottom-4 left-0 right-0 max-h-[90vh] w-full max-w-md bg-white shadow-2xl z-50 rounded-t-2xl mx-auto flex flex-col"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 text-white relative overflow-hidden">
@@ -128,7 +137,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
 
             {/* Contenido con scroll mejorado */}
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-
+              {/* Status y priority badges */}
               <div className="flex gap-3">
                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} border`}>
                   {incident.status === 'resolved' && <CheckCircle2 className="w-3 h-3 inline mr-1" />}
@@ -141,11 +150,13 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                 </div>
               </div>
 
+              {/* Título y descripción */}
               <div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{incident.title}</h3>
                 {incident.description && <p className="text-gray-600 leading-relaxed">{incident.description}</p>}
               </div>
 
+              {/* Ubicación */}
               <div className="bg-gray-50 rounded-2xl p-4">
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-blue-500 mt-0.5" />
@@ -159,6 +170,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                 </div>
               </div>
 
+              {/* Información de fecha y usuario */}
               <div className="grid gap-4">
                 <div className="flex items-center gap-3">
                   <Calendar className="w-5 h-5 text-gray-400" />
@@ -187,60 +199,66 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                 </div>
               </div>
 
-              {((incident.photos?.length ?? 0) > 0 || (incident.images?.length ?? 0) > 0) && (
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <Camera className="w-4 h-4" /> Fotografías ({(incident.photos || incident.images || []).length})
-                  </h4>
-                  <div className="space-y-3">
-                    {/* Imagen principal más grande */}
-                    {(incident.photos || incident.images?.map(img => img.url) || []).slice(0, 1).map((photo, index) => (
-                      <div key={index} className="relative group cursor-pointer">
-                        <img
-                          src={photo}
-                          alt={`Fotografía principal del incidente`}
-                          className="w-full h-48 object-cover rounded-2xl border-2 border-gray-200 hover:border-blue-400 transition-all duration-300 shadow-lg hover:shadow-xl"
-                          onClick={() => {
-                            // Abrir imagen en modal o nueva pestaña
-                            window.open(photo, '_blank');
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-2xl flex items-center justify-center transition-all duration-300">
-                          <div className="bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all">
-                            <Eye className="w-5 h-5 text-gray-800" />
-                          </div>
-                        </div>
-                        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
-                          <span className="text-white text-xs font-medium">Click para ampliar</span>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {/* Imágenes adicionales en grid si hay más de una */}
-                    {(incident.photos || incident.images?.map(img => img.url) || []).length > 1 && (
-                      <div className="grid grid-cols-3 gap-2">
-                        {(incident.photos || incident.images?.map(img => img.url) || []).slice(1).map((photo, index) => (
-                          <div key={index + 1} className="relative group cursor-pointer">
-                            <img
-                              src={photo}
-                              alt={`Fotografía ${index + 2} del incidente`}
-                              className="w-full h-20 object-cover rounded-xl border-2 border-gray-200 hover:border-blue-400 transition-all duration-300"
-                              onClick={() => {
-                                // Abrir imagen en modal o nueva pestaña
-                                window.open(photo, '_blank');
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl flex items-center justify-center transition-all duration-300">
-                              <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              {/* Fotografías */}
+              {(() => {
+                const storedImages = getImagesFromStorage(incident.photos);
+                const legacyImages = incident.images?.map(img => img.url) || [];
+                const allImages = storedImages.length > 0 ? storedImages : legacyImages;
+                
+                return allImages.length > 0 ? (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <Camera className="w-4 h-4" /> Fotografías ({allImages.length})
+                    </h4>
+                    <div className="space-y-3">
+                      {/* Imagen principal más grande */}
+                      {allImages.slice(0, 1).map((photo, index) => (
+                        <div key={index} className="relative group cursor-pointer">
+                          <img
+                            src={photo}
+                            alt={`Fotografía principal del incidente`}
+                            className="w-full h-48 object-cover rounded-2xl border-2 border-gray-200 hover:border-blue-400 transition-all duration-300 shadow-lg hover:shadow-xl"
+                            onClick={() => {
+                              window.open(photo, '_blank');
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-2xl flex items-center justify-center transition-all duration-300">
+                            <div className="bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all">
+                              <Eye className="w-5 h-5 text-gray-800" />
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
+                            <span className="text-white text-xs font-medium">Click para ampliar</span>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Imágenes adicionales en grid si hay más de una */}
+                      {allImages.length > 1 && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {allImages.slice(1).map((photo, index) => (
+                            <div key={index + 1} className="relative group cursor-pointer">
+                              <img
+                                src={photo}
+                                alt={`Fotografía ${index + 2} del incidente`}
+                                className="w-full h-20 object-cover rounded-xl border-2 border-gray-200 hover:border-blue-400 transition-all duration-300"
+                                onClick={() => {
+                                  window.open(photo, '_blank');
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl flex items-center justify-center transition-all duration-300">
+                                <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : null;
+              })()}
 
+              {/* Estadísticas de interacción */}
               <div className="bg-gray-50 rounded-2xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -257,6 +275,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                 </div>
               </div>
 
+              {/* Notas/Actualizaciones */}
               {incident.notes && incident.notes.length > 0 && (
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-3">Actualizaciones ({incident.notes.length})</h4>
@@ -277,16 +296,26 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
                   </div>
                 </div>
               )}
+              
+              {/* Espacio adicional para evitar que se corten los botones */}
+              <div className="h-4"></div>
             </div>
 
-            <div className="absolute bottom-0 left-0 right-0 bg-white border-t p-4 space-y-2">
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1 rounded-xl"><ThumbsUp className="w-4 h-4 mr-2" /> Útil</Button>
-                <Button variant="outline" className="flex-1 rounded-xl"><Share2 className="w-4 h-4 mr-2" /> Compartir</Button>
+            {/* Footer con botones - Posicionado fuera del scroll */}
+            <div className="bg-white border-t border-gray-200 px-6 py-4 rounded-b-2xl">
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1 rounded-xl text-sm py-2">
+                    <ThumbsUp className="w-4 h-4 mr-2" /> Útil
+                  </Button>
+                  <Button variant="outline" className="flex-1 rounded-xl text-sm py-2">
+                    <Share2 className="w-4 h-4 mr-2" /> Compartir
+                  </Button>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl text-sm py-2">
+                  <Eye className="w-4 h-4 mr-2" /> Seguir Incidencia
+                </Button>
               </div>
-              <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl">
-                <Eye className="w-4 h-4 mr-2" /> Seguir Incidencia
-              </Button>
             </div>
           </motion.div>
         </>

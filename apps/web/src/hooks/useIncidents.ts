@@ -6,101 +6,220 @@ import {
 } from "@ciudad-activa/types";
 import { ApiService } from "../services/apiService";
 
-// Helper function to convert API incident to app format
-const convertApiIncidentToAppFormat = (
-  apiIncident: any // Cambiamos a any temporalmente para debug
-): IncidentReport => {
-  console.log("🔄 Convirtiendo incidente:", apiIncident);
-  console.log("🎨 Color del tipo:", apiIncident.type?.color);
-
-  return {
-    id: apiIncident.id,
-    type: {
-      id: apiIncident.type?.id || "unknown",
-      name: apiIncident.type?.name || "Incidencia",
-      icon: apiIncident.type?.icon || "AlertTriangle",
-      color: apiIncident.type?.color || "#6b7280",
-      category: apiIncident.type?.category || "other",
-      description: apiIncident.type?.description || "",
-    },
-    title: apiIncident.title || "Sin título",
-    description: apiIncident.description || "",
-    coordinates: apiIncident.coordinates || { lat: 0, lng: 0 },
-    address: apiIncident.address || "",
-    status: apiIncident.status || "pending",
-    priority: apiIncident.priority || "medium",
-    reportedBy: apiIncident.reportedBy || "Usuario",
-    reportedAt: new Date(apiIncident.reportedAt || Date.now()),
-    updatedAt: new Date(apiIncident.updatedAt || Date.now()),
-    votes: apiIncident.votes || 0,
-    views: apiIncident.views || 0,
-    photos: apiIncident.photos || [],
-    tags: apiIncident.tags || [],
-  };
-};
+// Cache global para evitar múltiples cargas simultáneas
+let globalIncidentsCache: IncidentReport[] | null = null;
+let globalCacheTimestamp: number = 0;
+let activeLoadPromise: Promise<IncidentReport[]> | null = null;
+const CACHE_DURATION = 60000; // 1 minuto para reducir rate limiting (in-memory)
+const LS_CACHE_KEY = "ciudadactiva_incidents_cache_v1";
+const LS_CACHE_TS_KEY = "ciudadactiva_incidents_cache_ts_v1";
+const LS_MAX_AGE = 1000 * 60 * 60 * 24; // 24h persistente
 
 export function useIncidents() {
   console.log("🎯 useIncidents: Hook inicializado");
 
-  const [incidents, setIncidents] = useState<IncidentReport[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastFetch, setLastFetch] = useState<number>(0);
-
-  // Cache para evitar muchas peticiones
-  const CACHE_DURATION = 30000; // 30 segundos
-  const POLLING_INTERVAL = 60000; // 1 minuto para polling
-
-  // Load incidents from API
-  const loadIncidents = async (forceRefresh = false) => {
+  const [incidents, setIncidents] = useState<IncidentReport[]>(() => {
+    // Inicializar con caché si está disponible y es reciente
+    if (
+      globalIncidentsCache &&
+      Date.now() - globalCacheTimestamp < CACHE_DURATION
+    ) {
+      console.log("🔄 useIncidents: Usando datos del caché global inicial");
+      return globalIncidentsCache;
+    }
+    // Intentar con caché persistente en localStorage
     try {
-      // Verificar cache si no es un refresh forzado
-      const now = Date.now();
-      if (!forceRefresh && lastFetch && now - lastFetch < CACHE_DURATION) {
-        console.log("� useIncidents: Usando datos del cache");
+      const raw = localStorage.getItem(LS_CACHE_KEY);
+      const tsRaw = localStorage.getItem(LS_CACHE_TS_KEY);
+      if (raw && tsRaw) {
+        const ts = Number(tsRaw);
+        if (!isNaN(ts) && Date.now() - ts < LS_MAX_AGE) {
+          const parsed = JSON.parse(raw) as IncidentReport[];
+          console.log(
+            "💾 useIncidents: Cargando caché persistente (localStorage)"
+          );
+          globalIncidentsCache = parsed;
+          globalCacheTimestamp = Date.now();
+          return parsed;
+        }
+      }
+    } catch {}
+    return [];
+  });
+
+  const [loading, setLoading] = useState(!globalIncidentsCache);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load incidents from API with smart caching and deduplication
+  const loadIncidents = async (): Promise<void> => {
+    try {
+      console.log("🔄 useIncidents: Verificando necesidad de carga...");
+
+      // Si hay datos en caché recientes, usarlos
+      if (
+        globalIncidentsCache &&
+        Date.now() - globalCacheTimestamp < CACHE_DURATION
+      ) {
+        console.log("✅ useIncidents: Usando datos del caché (aún válidos)");
+        setIncidents(globalIncidentsCache);
+        setLoading(false);
+        setError(null);
         return;
       }
 
-      console.log("�🔄 useIncidents: Iniciando carga de incidentes...");
+      // Si ya hay una carga en progreso, esperarla
+      if (activeLoadPromise) {
+        console.log("⏳ useIncidents: Esperando carga en progreso...");
+        try {
+          const cachedData = await activeLoadPromise;
+          setIncidents(cachedData);
+          setLoading(false);
+          setError(null);
+          return;
+        } catch (err) {
+          console.log(
+            "❌ useIncidents: Error en carga en progreso, continuando..."
+          );
+        }
+      }
+
+      console.log("🔄 useIncidents: Iniciando carga fresca desde API...");
       setLoading(true);
       setError(null);
-      const apiIncidents = await ApiService.getIncidents();
-      console.log("📊 useIncidents: Incidentes recibidos:", apiIncidents);
-      const convertedIncidents = apiIncidents.map(
-        convertApiIncidentToAppFormat
-      );
-      console.log(
-        "✅ useIncidents: Incidentes convertidos:",
-        convertedIncidents
-      );
-      setIncidents(convertedIncidents);
-      setLastFetch(now);
+
+      // Crear promesa de carga global para deduplicar llamadas
+      activeLoadPromise = (async () => {
+        const apiIncidents = await ApiService.getIncidents();
+        console.log(
+          `📊 useIncidents: ${apiIncidents.length} incidentes recibidos de la API`
+        );
+
+        // Convertir los datos de la API al formato de la app
+        const convertedIncidents: IncidentReport[] = apiIncidents.map(
+          (apiIncident: any) => {
+            // Normalizar coordenadas desde múltiples posibles campos
+            const lat =
+              apiIncident.coordinates?.lat ??
+              apiIncident.latitude ??
+              apiIncident.lat ??
+              0;
+            const lng =
+              apiIncident.coordinates?.lng ??
+              apiIncident.longitude ??
+              apiIncident.lng ??
+              0;
+            return {
+              id: apiIncident.id,
+              type: {
+                id: apiIncident.type?.id || "unknown",
+                name: apiIncident.type?.name || "Incidencia",
+                icon: apiIncident.type?.icon || "AlertTriangle",
+                color: apiIncident.type?.color || "#6b7280",
+                category: apiIncident.type?.category || "other",
+                description: apiIncident.type?.description || "",
+              },
+              title: apiIncident.title || "Sin título",
+              description: apiIncident.description || "",
+              coordinates: { lat, lng },
+              address: apiIncident.address || "",
+              status: apiIncident.status || "pending",
+              priority: apiIncident.priority || "medium",
+              reportedBy: apiIncident.reported_by || "Usuario anónimo",
+              reportedAt: new Date(apiIncident.reported_at || Date.now()),
+              updatedAt: apiIncident.updated_at
+                ? new Date(apiIncident.updated_at)
+                : new Date(),
+              photos: apiIncident.photos || [],
+              images:
+                apiIncident.images?.map((img: any) => ({
+                  id: img.id,
+                  url: img.url,
+                  alt: img.alt || "Imagen de incidencia",
+                })) || [],
+              votes: apiIncident.votes || 0,
+              views: apiIncident.views || 0,
+              notes: apiIncident.notes || [],
+            };
+          }
+        );
+
+        // Actualizar caché global
+        globalIncidentsCache = convertedIncidents;
+        globalCacheTimestamp = Date.now();
+
+        console.log("✅ useIncidents: Datos almacenados en caché global");
+        // Guardar caché persistente
+        try {
+          localStorage.setItem(
+            LS_CACHE_KEY,
+            JSON.stringify(convertedIncidents)
+          );
+          localStorage.setItem(LS_CACHE_TS_KEY, String(Date.now()));
+        } catch {}
+        return convertedIncidents;
+      })();
+
+      const result = await activeLoadPromise;
+      setIncidents(result);
     } catch (err) {
       console.error("❌ useIncidents: Error loading incidents:", err);
-      setError(err instanceof Error ? err.message : "Failed to load incidents");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load incidents";
+      setError(errorMessage);
+
+      // Si tenemos datos en caché aunque sean antiguos, usarlos como fallback
+      if (globalIncidentsCache) {
+        console.log(
+          "🔄 useIncidents: Usando caché como fallback debido a error"
+        );
+        setIncidents(globalIncidentsCache);
+        setError(`${errorMessage} (mostrando datos del caché)`);
+      } else {
+        // Intentar usar caché persistente si existe
+        try {
+          const raw = localStorage.getItem(LS_CACHE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw) as IncidentReport[];
+            console.log(
+              "💾 useIncidents: Usando caché persistente como fallback"
+            );
+            setIncidents(parsed);
+          }
+        } catch {}
+      }
     } finally {
       setLoading(false);
+      activeLoadPromise = null; // Limpiar promesa activa
       console.log("🔚 useIncidents: Carga completada");
     }
   };
 
-  // Initial load y polling automático
+  // Initial load con debouncing
   useEffect(() => {
-    console.log(
-      "🔄 useIncidents: useEffect ejecutándose, iniciando carga inicial..."
-    );
-    loadIncidents();
+    console.log("🔄 useIncidents: useEffect ejecutándose...");
 
-    // Configurar polling cada minuto
-    const intervalId = setInterval(() => {
-      console.log("🔄 useIncidents: Polling automático ejecutándose...");
-      loadIncidents(false); // No forzar refresh, usa cache si es reciente
-    }, POLLING_INTERVAL);
+    // Si ya tenemos datos del caché, no necesitamos cargar inmediatamente
+    if (
+      globalIncidentsCache &&
+      Date.now() - globalCacheTimestamp < CACHE_DURATION
+    ) {
+      console.log(
+        "✅ useIncidents: Saltando carga inicial, datos en caché válidos"
+      );
+      return;
+    }
 
-    return () => {
-      console.log("🔄 useIncidents: Limpiando interval de polling");
-      clearInterval(intervalId);
-    };
+    // Pequeña demora para permitir que múltiples instancias del hook se inicialicen
+    const timeoutId = setTimeout(() => {
+      loadIncidents().finally(() => {
+        // Señal global para que otras cargas esperen a incidentes primero
+        try {
+          (window as any).__incidentsFirstLoadDone = true;
+        } catch {}
+      });
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const addIncident = async (data: CreateIncidentData): Promise<string> => {
@@ -108,8 +227,7 @@ export function useIncidents() {
       console.log("🔄 useIncidents: Iniciando creación de incidente...", data);
       setError(null);
 
-      // We need to get the type information from the typeId
-      // For now, we'll create a mapping of common types
+      // Mapping de tipos comunes
       const typeMapping: Record<
         string,
         { name: string; icon: string; color: string; category: string }
@@ -163,20 +281,24 @@ export function useIncidents() {
         typeCategory: data.typeCategory || typeInfo.category,
         latitude: data.latitude,
         longitude: data.longitude,
-        address: data.address || "", // Will be filled by geocoding if available
+        address: data.address || "",
         priority: data.priority || "medium",
-        reportedBy: data.reportedBy || "Usuario Web", // Default user
+        reportedBy: data.reportedBy || "Usuario Web",
         photos: data.photos || [],
-        tags: [], // Default empty tags
+        tags: [],
       };
 
       console.log("📤 useIncidents: Enviando datos a API:", apiData);
       const result = await ApiService.createIncident(apiData);
       console.log("✅ useIncidents: Incidente creado exitosamente:", result);
 
-      // Reload incidents to get the updated list
+      // Invalidar caché para forzar recarga
+      globalIncidentsCache = null;
+      globalCacheTimestamp = 0;
+
+      // Recargar incidents para obtener el nuevo
       console.log("🔄 useIncidents: Recargando lista de incidentes...");
-      await loadIncidents(true); // Forzar refresh para obtener el nuevo incidente
+      await loadIncidents();
 
       return result.id;
     } catch (err) {
@@ -203,7 +325,15 @@ export function useIncidents() {
         )
       );
 
-      // TODO: Add API endpoint for updating incident status when backend supports it
+      // Invalidar caché
+      if (globalIncidentsCache) {
+        globalIncidentsCache = globalIncidentsCache.map((incident) =>
+          incident.id === id
+            ? { ...incident, status, updatedAt: new Date() }
+            : incident
+        );
+      }
+
       console.log(
         `Status update for incident ${id} to ${status} - API endpoint not yet implemented`
       );
@@ -212,8 +342,7 @@ export function useIncidents() {
       setError(
         err instanceof Error ? err.message : "Failed to update incident status"
       );
-      // Reload incidents to restore correct state
-      await loadIncidents();
+      await loadIncidents(); // Restore correct state
     }
   };
 
@@ -238,17 +367,32 @@ export function useIncidents() {
       );
 
       await ApiService.voteIncident(id, action);
+
+      // Invalidar caché parcialmente
+      if (globalIncidentsCache) {
+        globalIncidentsCache = globalIncidentsCache.map((incident) =>
+          incident.id === id
+            ? {
+                ...incident,
+                votes: (incident.votes || 0) + (action === "up" ? 1 : -1),
+                updatedAt: new Date(),
+              }
+            : incident
+        );
+      }
     } catch (err) {
       console.error("Error voting on incident:", err);
       setError(
         err instanceof Error ? err.message : "Failed to vote on incident"
       );
-      // Reload incidents to restore correct state
-      await loadIncidents();
+      await loadIncidents(); // Restore correct state
     }
   };
 
   const refreshIncidents = async (): Promise<void> => {
+    // Invalidar caché y forzar recarga
+    globalIncidentsCache = null;
+    globalCacheTimestamp = 0;
     await loadIncidents();
   };
 

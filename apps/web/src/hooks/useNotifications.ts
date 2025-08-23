@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ApiService, type ApiNotification } from "../services/apiService";
 
 export interface NotificationData {
@@ -29,6 +29,7 @@ const convertApiNotificationToAppFormat = (
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [loading, setLoading] = useState(false);
+  const isInitialized = useRef(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadNotifications = async () => {
@@ -73,7 +74,13 @@ export const useNotifications = () => {
 
   const markAllAsRead = async () => {
     try {
-      await ApiService.markAllNotificationsAsRead();
+      // Mark all notifications as read individually since markAllNotificationsAsRead doesn't exist
+      const unreadNotifications = notifications.filter((n) => !n.isRead);
+      await Promise.all(
+        unreadNotifications.map((notif) =>
+          ApiService.markNotificationAsRead(notif.id)
+        )
+      );
       setNotifications((prev) =>
         prev.map((notif) => ({ ...notif, isRead: true }))
       );
@@ -87,12 +94,32 @@ export const useNotifications = () => {
   };
 
   useEffect(() => {
-    loadNotifications();
+    // Evitar dobles ejecuciones en StrictMode
+    if (isInitialized.current) {
+      return;
+    }
+    isInitialized.current = true;
 
-    // Polling cada 2 minutos para notificaciones
-    const intervalId = setInterval(loadNotifications, 120000);
+    // Esperar a que incidentes haga su primera carga para priorizar ese endpoint
+    const start = Date.now();
+    const maxWaitMs = 10000; // 10s máximo
+    const tryStart = () => {
+      const done = (window as any).__incidentsFirstLoadDone;
+      if (done || Date.now() - start > maxWaitMs) {
+        loadNotifications();
+      } else {
+        setTimeout(tryStart, 300);
+      }
+    };
+    tryStart();
 
-    return () => clearInterval(intervalId);
+    // Polling cada 5 minutos para notificaciones (reducido para evitar rate limiting)
+    const intervalId = setInterval(loadNotifications, 300000);
+
+    return () => {
+      clearInterval(intervalId);
+      isInitialized.current = false;
+    };
   }, []);
 
   return {
