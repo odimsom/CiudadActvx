@@ -57,13 +57,7 @@ body {
   cursor: none;
 }
 
-/* Animación para el spinner de carga */
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* Animación para el spinner de carga - usa la de Tailwind */
 .animate-spin {
   animation: spin 1s linear infinite;
 }

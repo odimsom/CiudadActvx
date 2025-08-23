@@ -59,7 +59,11 @@ export const MobileReportModal: React.FC<MobileReportModalProps> = ({
 
   const handlePhotoSelection = (source: 'camera' | 'gallery') => {
     if (source === 'camera') {
-      cameraInputRef.current?.click();
+      // Para cámara, configuramos el input para capturar directamente
+      if (cameraInputRef.current) {
+        cameraInputRef.current.setAttribute('capture', 'environment');
+        cameraInputRef.current.click();
+      }
     } else {
       fileInputRef.current?.click();
     }
@@ -324,96 +328,149 @@ export const MobileReportModal: React.FC<MobileReportModalProps> = ({
               </div>
             )}
 
-            {/* Paso 3: Fotos */}
+            {/* Paso 3: Fotos - Mejorado */}
             {currentStep === 3 && (
-              <div className="space-y-4 animate-fadeIn">
-                <h3 className="text-lg font-semibold mb-4 text-center">
-                  Agrega fotos (opcional) 📸
-                </h3>
+              <div className="space-y-6 animate-fadeIn">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Agrega fotos 📸
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Las fotos ayudan a resolver el problema más rápido
+                  </p>
+                </div>
 
-                {/* Opciones de cámara */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* Opciones de cámara mejoradas */}
+                <div className="space-y-3">
                   <button
                     type="button"
                     onClick={() => handlePhotoSelection('camera')}
-                    className="flex flex-col items-center p-6 border-2 border-dashed border-blue-300 rounded-xl hover:bg-blue-50 transition-colors"
+                    className="w-full flex items-center gap-4 p-4 border-2 border-blue-300 border-dashed rounded-xl hover:bg-blue-50 transition-all duration-200 group"
                   >
-                    <Camera className="w-8 h-8 text-blue-500 mb-2" />
-                    <span className="text-sm font-medium text-blue-700">
-                      Tomar Foto
-                    </span>
+                    <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
+                      <Camera className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold text-gray-800">
+                        📱 Tomar Foto Ahora
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Abre la cámara para capturar el problema
+                      </div>
+                    </div>
+                    <div className="text-blue-600 font-bold text-xl">→</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handlePhotoSelection('gallery')}
-                    className="flex flex-col items-center p-6 border-2 border-dashed border-purple-300 rounded-xl hover:bg-purple-50 transition-colors"
+                    className="w-full flex items-center gap-4 p-4 border-2 border-purple-300 border-dashed rounded-xl hover:bg-purple-50 transition-all duration-200 group"
                   >
-                    <ImageIcon className="w-8 h-8 text-purple-500 mb-2" />
-                    <span className="text-sm font-medium text-purple-700">
-                      Desde Galería
-                    </span>
+                    <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
+                      <ImageIcon className="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold text-gray-800">
+                        🖼️ Elegir de Galería
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Selecciona fotos existentes
+                      </div>
+                    </div>
+                    <div className="text-purple-600 font-bold text-xl">→</div>
                   </button>
                 </div>
 
-                {/* Input ocultos para archivos */}
+                {/* Input files mejorados */}
                 <input
                   ref={cameraInputRef}
                   type="file"
                   accept="image/*"
                   capture="environment"
-                  multiple
                   onChange={handleFileChange}
                   className="hidden"
+                  multiple={false}
                 />
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
-                  multiple
                   onChange={handleFileChange}
                   className="hidden"
+                  multiple
                 />
 
-                {/* Preview de fotos */}
+                {/* Preview de fotos mejorado */}
                 {photos.length > 0 && (
                   <div className="space-y-3">
-                    <h4 className="font-medium text-gray-700">
-                      Fotos seleccionadas ({photos.length}/3)
-                    </h4>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-gray-700 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        Fotos agregadas ({photos.length}/3)
+                      </h4>
+                      {photos.length < 3 && (
+                        <button
+                          type="button"
+                          onClick={() => handlePhotoSelection('camera')}
+                          className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center gap-1"
+                        >
+                          <Camera className="w-3 h-3" />
+                          Agregar más
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
                       {photos.map((photo, index) => (
                         <div key={index} className="relative group">
                           <img
                             src={URL.createObjectURL(photo)}
                             alt={`Foto ${index + 1}`}
-                            className="w-full h-20 object-cover rounded-lg border-2 border-gray-200"
+                            className="w-full aspect-square object-cover rounded-xl border-2 border-gray-200 shadow-sm group-hover:shadow-md transition-all"
                           />
                           <button
                             type="button"
                             onClick={() => removePhoto(index)}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                            className="absolute -top-2 -right-2 w-7 h-7 bg-red-500 text-white rounded-full text-sm hover:bg-red-600 transition-all shadow-lg opacity-0 group-hover:opacity-100 flex items-center justify-center font-bold"
                           >
                             ×
                           </button>
+                          <div className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-2 py-1 rounded-md">
+                            {index + 1}
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="flex gap-3">
+                {/* Información adicional */}
+                <div className="bg-blue-50 p-3 rounded-xl border border-blue-200">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">💡 Consejos para mejores fotos:</p>
+                      <ul className="text-xs space-y-1 text-blue-700">
+                        <li>• Asegúrate de que haya buena iluminación</li>
+                        <li>• Enfoca bien el problema</li>
+                        <li>• Incluye referencias de ubicación si es posible</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Botones de navegación */}
+                <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => setCurrentStep(2)}
-                    className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-medium"
+                    className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-colors"
                   >
-                    Atrás
+                    ← Atrás
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting || !title.trim()}
-                    className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-2 py-3 px-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg"
                   >
                     {isSubmitting ? (
                       <>
@@ -423,7 +480,7 @@ export const MobileReportModal: React.FC<MobileReportModalProps> = ({
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Enviar Reporte
+                        Enviar Reporte ✨
                       </>
                     )}
                   </button>

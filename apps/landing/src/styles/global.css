@@ -12,46 +12,8 @@
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 html {
   scroll-behavior: smooth;
-}
-
-/* Animaciones personalizadas */
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-pulse-slow {
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.animate-bounce-slow {
-  animation: bounce 3s ease-in-out infinite;
-}
-
-@keyframes sonar {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-.animate-sonar {
-  animation: sonar 2s ease-out infinite;
 }
 
 /* Estilos para el mapa */

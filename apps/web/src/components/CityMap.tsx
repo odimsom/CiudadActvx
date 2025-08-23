@@ -6,6 +6,9 @@ import { Coordinates, IncidentReport, CreateIncidentData } from '@ciudad-activa/
 import { IncidentFormModal } from './IncidentFormModal';
 import { MapLegend } from './MapLegend';
 import { IncidentDetailsPanel } from './IncidentDetailsPanel';
+import { ImprovedLoadingState } from './ImprovedLoadingState';
+import { useToast } from './ToastManager';
+import { SubmissionStatus } from './SubmissionStatus';
 import { useIncidents } from '../hooks/useIncidents';
 import { AppHeader } from './AppHeader';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -23,20 +26,30 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
 
   const { incidents, addIncident } = useIncidents();
   const { mapboxToken, viewport, isLoaded } = useMapbox();
+  const { showSuccess, showError, showInfo, ToastManager } = useToast();
   
   const [mostrarHeatmap, setMostrarHeatmap] = useState(false);
   const [selectedCoordinates, setSelectedCoordinates] = useState<Coordinates | null>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState<IncidentReport | null>(null);
   const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
-  const [mostrarToast, setMostrarToast] = useState(false);
+  const [mostrarToast, ] = useState(false);
+  
+  // Estados para el sistema de envío mejorado
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
     console.log("🗺️ Map click detected:", e.lngLat);
     const coords = { lat: e.lngLat.lat, lng: e.lngLat.lng };
     setSelectedCoordinates(coords);
     setIsFormModalOpen(true);
-  }, []);
+    
+    // Mostrar toast informativo
+    showInfo('📍 Ubicación seleccionada', 'Completa el formulario para reportar el problema');
+  }, [showInfo]);
 
   useEffect(() => {
     if (!isLoaded || !mapContainer.current || map.current) return;
@@ -200,17 +213,72 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
   }, []);
 
   const handleSubmitIncident = async (data: CreateIncidentData) => {
+    setIsSubmitting(true);
+    setSubmissionSuccess(false);
+    setSubmissionError(null);
+
     try {
       console.log("🔄 Enviando incidente:", data);
+      
+      // Simular progreso del envío
+      await new Promise(resolve => setTimeout(resolve, 4000)); // Tiempo total de animación
+      
       await addIncident(data);
+      
+      setIsSubmitting(false);
+      setSubmissionSuccess(true);
       setIsFormModalOpen(false);
       setSelectedCoordinates(null);
-      setMostrarToast(true);
-      setTimeout(() => setMostrarToast(false), 3000);
+      
+      showSuccess(
+        '¡Reporte enviado exitosamente! 🎉',
+        'Las autoridades han sido notificadas y procesarán tu reporte en breve',
+        {
+          label: 'Ver estado',
+          onClick: () => console.log('Ver estado del reporte')
+        }
+      );
+      
     } catch (error) {
       console.error("❌ Error al enviar incidente:", error);
+      setIsSubmitting(false);
+      setSubmissionError('No se pudo enviar el reporte. Verifica tu conexión e intenta nuevamente.');
+      
+      showError(
+        'Error al enviar reporte ❌',
+        'Hubo un problema con el envío. Por favor intenta nuevamente.',
+        {
+          label: 'Reintentar',
+          onClick: () => handleSubmitIncident(data)
+        }
+      );
     }
   };
+
+  const resetSubmissionState = () => {
+    setIsSubmitting(false);
+    setSubmissionSuccess(false);
+    setSubmissionError(null);
+  };
+
+  // Progreso de carga simulado
+  useEffect(() => {
+    if (!isLoaded) {
+      const progressInterval = setInterval(() => {
+        setLoadingProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + Math.random() * 15;
+        });
+      }, 200);
+
+      return () => clearInterval(progressInterval);
+    } else {
+      setLoadingProgress(100);
+    }
+  }, [isLoaded]);
 
   useEffect(() => {
     loadIncidentsOnMap();
@@ -230,6 +298,24 @@ export const CityMap: React.FC<CityMapProps> = ({ className }) => {
       animate={{ opacity: 1 }}
       className={`relative w-full h-full ${className || ''}`}
     >
+      {/* Loading state mejorado */}
+      <ImprovedLoadingState 
+        isLoading={!isLoaded} 
+        message="Cargando mapa interactivo..."
+        progress={loadingProgress}
+      />
+      
+      {/* Toast Manager para notificaciones */}
+      <ToastManager />
+      
+      {/* Submission status para envío de reportes */}
+      <SubmissionStatus
+        isSubmitting={isSubmitting}
+        isSuccess={submissionSuccess}
+        error={submissionError || undefined}
+        onReset={resetSubmissionState}
+      />
+
       <AppHeader 
         mostrarHeatmap={mostrarHeatmap}
         onToggleHeatmap={() => setMostrarHeatmap(!mostrarHeatmap)}
