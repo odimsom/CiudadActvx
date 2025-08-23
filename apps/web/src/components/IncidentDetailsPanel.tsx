@@ -101,7 +101,7 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-4 left-0 right-0 max-h-[80vh] w-full max-w-md bg-white shadow-2xl z-50 overflow-hidden rounded-t-2xl mx-auto"
+            className="fixed bottom-4 left-0 right-0 max-h-[90vh] w-full max-w-md bg-white shadow-2xl z-50 rounded-t-2xl mx-auto flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 text-white relative overflow-hidden">
@@ -126,8 +126,8 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
               </div>
             </div>
 
-            {/* Contenido */}
-            <div className="h-full overflow-y-auto max-h-[calc(80vh-130px)] p-6 space-y-6">
+            {/* Contenido con scroll mejorado */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
 
               <div className="flex gap-3">
                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} border`}>
@@ -190,21 +190,53 @@ export const IncidentDetailsPanel: React.FC<IncidentDetailsPanelProps> = ({
               {((incident.photos?.length ?? 0) > 0 || (incident.images?.length ?? 0) > 0) && (
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                    <Camera className="w-4 h-4" /> Fotografías
+                    <Camera className="w-4 h-4" /> Fotografías ({(incident.photos || incident.images || []).length})
                   </h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(incident.photos || incident.images?.map(img => img.url) || []).map((photo, index) => (
-                      <div key={index} className="relative group">
+                  <div className="space-y-3">
+                    {/* Imagen principal más grande */}
+                    {(incident.photos || incident.images?.map(img => img.url) || []).slice(0, 1).map((photo, index) => (
+                      <div key={index} className="relative group cursor-pointer">
                         <img
                           src={photo}
-                          alt={`Fotografía ${index + 1} del incidente`}
-                          className="w-full h-24 object-cover rounded-xl border-2 border-gray-200 hover:border-blue-400 transition-colors cursor-pointer"
+                          alt={`Fotografía principal del incidente`}
+                          className="w-full h-48 object-cover rounded-2xl border-2 border-gray-200 hover:border-blue-400 transition-all duration-300 shadow-lg hover:shadow-xl"
+                          onClick={() => {
+                            // Abrir imagen en modal o nueva pestaña
+                            window.open(photo, '_blank');
+                          }}
                         />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl flex items-center justify-center transition-colors">
-                          <Eye className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-2xl flex items-center justify-center transition-all duration-300">
+                          <div className="bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100 transition-all">
+                            <Eye className="w-5 h-5 text-gray-800" />
+                          </div>
+                        </div>
+                        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full">
+                          <span className="text-white text-xs font-medium">Click para ampliar</span>
                         </div>
                       </div>
                     ))}
+                    
+                    {/* Imágenes adicionales en grid si hay más de una */}
+                    {(incident.photos || incident.images?.map(img => img.url) || []).length > 1 && (
+                      <div className="grid grid-cols-3 gap-2">
+                        {(incident.photos || incident.images?.map(img => img.url) || []).slice(1).map((photo, index) => (
+                          <div key={index + 1} className="relative group cursor-pointer">
+                            <img
+                              src={photo}
+                              alt={`Fotografía ${index + 2} del incidente`}
+                              className="w-full h-20 object-cover rounded-xl border-2 border-gray-200 hover:border-blue-400 transition-all duration-300"
+                              onClick={() => {
+                                // Abrir imagen en modal o nueva pestaña
+                                window.open(photo, '_blank');
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl flex items-center justify-center transition-all duration-300">
+                              <Eye className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
